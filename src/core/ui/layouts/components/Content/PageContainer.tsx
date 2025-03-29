@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { cn } from '@/src/core/utils/styling';
+import { useLayout } from '../../providers/LayoutProvider';
 
 type PageContainerProps = {
   className?: string;
@@ -11,6 +12,7 @@ type PageContainerProps = {
 /**
  * Page container component
  * Provides consistent padding and max-width for page content
+ * with enhanced mobile responsiveness
  */
 export function PageContainer({ 
   className, 
@@ -18,6 +20,8 @@ export function PageContainer({
   maxWidth = '2xl',
   padding = 'md'
 }: PageContainerProps) {
+  const { isSmallMobile } = useLayout();
+
   return (
     <div className={cn(
       "w-full mx-auto",
@@ -31,12 +35,14 @@ export function PageContainer({
         'max-w-7xl': maxWidth === '2xl',
         '': maxWidth === 'full',
         
-        // Padding classes
+        // Padding classes - enhanced for mobile
         'px-0 py-0': padding === 'none',
-        'px-3 py-3 sm:px-4 sm:py-4': padding === 'sm',
-        'px-4 py-6 sm:px-6': padding === 'md',
-        'px-4 py-8 sm:px-6 sm:py-10': padding === 'lg',
+        'px-2 py-2 xs:px-3 xs:py-3 sm:px-4 sm:py-4': padding === 'sm',
+        'px-3 py-4 xs:px-4 xs:py-5 sm:px-6 sm:py-6': padding === 'md',
+        'px-3 py-5 xs:px-4 xs:py-6 sm:px-6 sm:py-8 md:px-8 md:py-10': padding === 'lg',
       },
+      // Additional padding adjustment for very small screens
+      isSmallMobile && 'max-w-full overflow-x-hidden',
       className
     )}>
       {children}

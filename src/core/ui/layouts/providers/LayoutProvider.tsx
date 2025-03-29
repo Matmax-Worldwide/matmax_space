@@ -15,6 +15,8 @@ type LayoutContextType = {
   isMobile: boolean;
   isTablet: boolean;
   isDesktop: boolean;
+  isSmallMobile: boolean;
+  isLargeMobile: boolean;
   
   // Layout configuration
   layoutType: 'dashboard' | 'minimal' | 'auth' | 'marketing';
@@ -36,10 +38,12 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
   // Theme state (with system preference detection)
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
   
-  // Responsive state
+  // Responsive state with more precise breakpoints
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [isDesktop, setIsDesktop] = useState(true);
+  const [isSmallMobile, setIsSmallMobile] = useState(false);
+  const [isLargeMobile, setIsLargeMobile] = useState(false);
   
   // Layout type
   const [layoutType, setLayoutType] = useState<'dashboard' | 'minimal' | 'auth' | 'marketing'>('dashboard');
@@ -51,9 +55,13 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
     
     const handleResize = () => {
       const width = window.innerWidth;
-      setIsMobile(width < 768);
-      setIsTablet(width >= 768 && width < 1024);
-      setIsDesktop(width >= 1024);
+      
+      // Enhanced mobile breakpoints
+      setIsSmallMobile(width < 480); // Extra small devices
+      setIsLargeMobile(width >= 480 && width < 768); // Medium mobile devices
+      setIsMobile(width < 768); // All mobile devices
+      setIsTablet(width >= 768 && width < 1024); // Tablet devices
+      setIsDesktop(width >= 1024); // Desktop devices
       
       // Auto-close sidebar on small screens
       if (width < 768) {
@@ -64,8 +72,8 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
     // Initial check
     handleResize();
     
-    // Add event listener
-    window.addEventListener('resize', handleResize);
+    // Add event listener with passive option for better performance
+    window.addEventListener('resize', handleResize, { passive: true });
     
     // Clean up event listener
     return () => window.removeEventListener('resize', handleResize);
@@ -118,6 +126,8 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
         isMobile,
         isTablet,
         isDesktop,
+        isSmallMobile,
+        isLargeMobile,
         layoutType,
         setLayoutType
       }}

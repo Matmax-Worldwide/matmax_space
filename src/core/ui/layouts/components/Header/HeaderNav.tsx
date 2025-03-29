@@ -12,7 +12,8 @@ import {
   BarChart,
   Headphones,
   Settings,
-  ChevronDown
+  ChevronDown,
+  Menu
 } from 'lucide-react';
 import { useLayout } from '../../providers/LayoutProvider';
 
@@ -42,6 +43,7 @@ type NavItemType = {
  * - Integration with the sidebar via useLayout
  * - Permission-based visibility control
  * - Accessibility support with ARIA attributes
+ * - Responsive design with mobile-specific layout
  * 
  * Usage:
  * <HeaderNav /> - typically used within the Header component
@@ -55,10 +57,12 @@ type NavItemType = {
  */
 export function HeaderNav() {
   const pathname = usePathname();
-  const { setSidebarOpen } = useLayout();
+  const { setSidebarOpen, isMobile, isSmallMobile, isTablet } = useLayout();
   
   // Track opened dropdown
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  // Track mobile menu open state
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   // In a real app, this would come from an auth context
   const userPermissions = ['admin.view', 'lms.view', 'finance.view', 'payments.view', 'main.view'];
@@ -167,6 +171,9 @@ export function HeaderNav() {
     // Close any open dropdowns
     setOpenDropdown(null);
     
+    // Close mobile menu
+    setMobileMenuOpen(false);
+    
     // If no children, navigate directly
     if (!hasChildren) {
       window.location.href = href;
@@ -185,106 +192,126 @@ export function HeaderNav() {
     };
   }, []);
   
+  // Close mobile menu on resize to desktop
+  useEffect(() => {
+    if (!isMobile && mobileMenuOpen) {
+      setMobileMenuOpen(false);
+    }
+  }, [isMobile, mobileMenuOpen]);
+  
   // Check if user has permission for an item
   const hasPermission = (item: NavItemType) => {
     if (!item.permissions || item.permissions.length === 0) return true;
     return item.permissions.some(permission => userPermissions.includes(permission));
   };
   
-  return (
-    <nav className="flex">
-      <ul className="flex items-center space-x-2">
+  // Determine if we should use mobile layout
+  const useMobileLayout = isMobile || isTablet;
+  
+  // Render mobile menu button
+  const renderMobileMenuButton = () => (
+    <button
+      onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+      className="flex items-center justify-center p-2 rounded-md bg-white dark:bg-neutral-800 border border-border shadow-sm"
+      aria-expanded={mobileMenuOpen}
+      aria-controls="mobile-nav"
+      aria-label="Toggle navigation menu"
+    >
+      <Menu size={20} />
+      <span className="ml-2 text-sm font-medium">Menu</span>
+    </button>
+  );
+  
+  // Render mobile navigation panel
+  const renderMobileNavPanel = () => (
+    <div
+      id="mobile-nav"
+      className={cn(
+        "absolute left-0 right-0 top-full mt-1 bg-white dark:bg-neutral-800 border border-border rounded-md shadow-lg z-50 transition-all duration-200 overflow-hidden",
+        isSmallMobile ? "mx-2" : "mx-4",
+        mobileMenuOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+      )}
+    >
+      <div className="p-2 max-h-[80vh] overflow-y-auto">
         {navItems.filter(hasPermission).map((item) => {
           const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
-          const isOpen = openDropdown === item.title;
           
           return (
-            <li key={item.href} className="relative">
-              {item.children ? (
-                <>
-                  {/* Menu item with dropdown */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleDropdown(item.title);
-                      // Also trigger navigation to open the sidebar
-                      handleNavigation(item.href, true);
-                    }}
-                    className={cn(
-                      "flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-all shadow-sm hover:shadow",
-                      {
-                        // Highlighted state (current module)
-                        "bg-gradient-to-r text-white": item.isHighlighted,
-                        [item.color || ""]: item.isHighlighted,
-                        
-                        // Active state (non-highlighted but active)
-                        "bg-primary/10 text-primary border-b-2 border-primary": isActive && !item.isHighlighted,
-                        
-                        // Normal state
-                        "bg-white dark:bg-neutral-800 text-foreground hover:bg-gray-100 dark:hover:bg-neutral-700": !isActive && !item.isHighlighted,
-                        
-                        // Opened dropdown indicator
-                        "ring-2 ring-primary/20": isOpen && !item.isHighlighted
-                      }
-                    )}
-                    aria-expanded={isOpen}
-                    aria-controls={`dropdown-${item.title}`}
-                  >
-                    <item.icon className="h-4 w-4 mr-1.5 flex-shrink-0" />
-                    <span>{item.title}</span>
-                    <ChevronDown 
-                      size={14} 
-                      className={cn(
-                        "ml-1.5 transition-transform duration-200", 
-                        isOpen ? "rotate-180" : ""
-                      )} 
-                    />
-                  </button>
-                  
-                  {/* Dropdown menu */}
-                  {isOpen && (
-                    <div 
-                      id={`dropdown-${item.title}`}
-                      className="absolute left-0 top-full mt-1 w-56 bg-white dark:bg-neutral-800 border border-border rounded-md shadow-lg z-30 py-1 overflow-hidden"
-                    >
-                      <div className="py-1 border-b border-border px-3 text-xs font-medium text-muted-foreground uppercase">
-                        {item.title} Module
-                      </div>
-                      {item.children.map((child) => {
-                        const childPath = `${child.href}`;
-                        const isChildActive = pathname === childPath;
-                        
-                        return (
-                          <Link
-                            key={childPath}
-                            href={childPath}
-                            onClick={() => {
-                              setSidebarOpen(true);
-                              setOpenDropdown(null);
-                            }}
-                            className={cn(
-                              "block px-4 py-2 text-sm hover:bg-muted flex items-center",
-                              isChildActive
-                                ? "text-primary bg-primary/5 font-medium"
-                                : "text-foreground"
-                            )}
-                          >
-                            <span className={cn(
-                              "w-1.5 h-1.5 rounded-full mr-2",
-                              isChildActive ? "bg-primary" : "bg-muted-foreground"
-                            )}></span>
-                            {child.title}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  )}
-                </>
-              ) : (
-                /* Regular menu item without dropdown */
-                <Link
-                  href={item.href}
-                  onClick={() => handleNavigation(item.href, false)}
+            <div key={item.href} className="mb-1">
+              {/* Mobile module heading */}
+              <div 
+                className={cn(
+                  "flex items-center px-3 py-2 rounded-md text-sm font-medium",
+                  {
+                    "bg-gradient-to-r text-white": item.isHighlighted,
+                    [item.color || ""]: item.isHighlighted,
+                    "bg-primary/10 text-primary": isActive && !item.isHighlighted,
+                    "bg-white dark:bg-neutral-800 text-foreground": !isActive && !item.isHighlighted
+                  }
+                )}
+              >
+                <item.icon className="h-4 w-4 mr-2 flex-shrink-0" />
+                <span>{item.title}</span>
+              </div>
+              
+              {/* Mobile sub-items */}
+              {item.children && (
+                <div className="ml-5 mt-1 border-l-2 border-muted pl-3 space-y-1">
+                  {item.children.map((child) => {
+                    const childPath = `${child.href}`;
+                    const isChildActive = pathname === childPath;
+                    
+                    return (
+                      <Link
+                        key={childPath}
+                        href={childPath}
+                        onClick={() => {
+                          setSidebarOpen(true);
+                          setMobileMenuOpen(false);
+                        }}
+                        className={cn(
+                          "block px-3 py-1.5 text-sm rounded-md hover:bg-muted flex items-center",
+                          isChildActive
+                            ? "text-primary bg-primary/5 font-medium"
+                            : "text-foreground"
+                        )}
+                      >
+                        <span className={cn(
+                          "w-1.5 h-1.5 rounded-full mr-2",
+                          isChildActive ? "bg-primary" : "bg-muted-foreground"
+                        )}></span>
+                        {child.title}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+  
+  // Render desktop navigation
+  const renderDesktopNav = () => (
+    <ul className="flex items-center space-x-2">
+      {navItems.filter(hasPermission).map((item) => {
+        const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
+        const isOpen = openDropdown === item.title;
+        
+        return (
+          <li key={item.href} className="relative">
+            {item.children ? (
+              <>
+                {/* Menu item with dropdown */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleDropdown(item.title);
+                    // Also trigger navigation to open the sidebar
+                    handleNavigation(item.href, true);
+                  }}
                   className={cn(
                     "flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-all shadow-sm hover:shadow",
                     {
@@ -296,18 +323,105 @@ export function HeaderNav() {
                       "bg-primary/10 text-primary border-b-2 border-primary": isActive && !item.isHighlighted,
                       
                       // Normal state
-                      "bg-white dark:bg-neutral-800 text-foreground hover:bg-gray-100 dark:hover:bg-neutral-700": !isActive && !item.isHighlighted
+                      "bg-white dark:bg-neutral-800 text-foreground hover:bg-gray-100 dark:hover:bg-neutral-700": !isActive && !item.isHighlighted,
+                      
+                      // Opened dropdown indicator
+                      "ring-2 ring-primary/20": isOpen && !item.isHighlighted
                     }
                   )}
+                  aria-expanded={isOpen}
+                  aria-controls={`dropdown-${item.title}`}
                 >
                   <item.icon className="h-4 w-4 mr-1.5 flex-shrink-0" />
                   <span>{item.title}</span>
-                </Link>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+                  <ChevronDown 
+                    size={14} 
+                    className={cn(
+                      "ml-1.5 transition-transform duration-200", 
+                      isOpen ? "rotate-180" : ""
+                    )} 
+                  />
+                </button>
+                
+                {/* Dropdown menu */}
+                {isOpen && (
+                  <div 
+                    id={`dropdown-${item.title}`}
+                    className="absolute left-0 top-full mt-1 w-56 bg-white dark:bg-neutral-800 border border-border rounded-md shadow-lg z-30 py-1 overflow-hidden"
+                  >
+                    <div className="py-1 border-b border-border px-3 text-xs font-medium text-muted-foreground uppercase">
+                      {item.title} Module
+                    </div>
+                    {item.children.map((child) => {
+                      const childPath = `${child.href}`;
+                      const isChildActive = pathname === childPath;
+                      
+                      return (
+                        <Link
+                          key={childPath}
+                          href={childPath}
+                          onClick={() => {
+                            setSidebarOpen(true);
+                            setOpenDropdown(null);
+                          }}
+                          className={cn(
+                            "block px-4 py-2 text-sm hover:bg-muted flex items-center",
+                            isChildActive
+                              ? "text-primary bg-primary/5 font-medium"
+                              : "text-foreground"
+                          )}
+                        >
+                          <span className={cn(
+                            "w-1.5 h-1.5 rounded-full mr-2",
+                            isChildActive ? "bg-primary" : "bg-muted-foreground"
+                          )}></span>
+                          {child.title}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </>
+            ) : (
+              /* Regular menu item without dropdown */
+              <Link
+                href={item.href}
+                onClick={() => handleNavigation(item.href, false)}
+                className={cn(
+                  "flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-all shadow-sm hover:shadow",
+                  {
+                    // Highlighted state (current module)
+                    "bg-gradient-to-r text-white": item.isHighlighted,
+                    [item.color || ""]: item.isHighlighted,
+                    
+                    // Active state (non-highlighted but active)
+                    "bg-primary/10 text-primary border-b-2 border-primary": isActive && !item.isHighlighted,
+                    
+                    // Normal state
+                    "bg-white dark:bg-neutral-800 text-foreground hover:bg-gray-100 dark:hover:bg-neutral-700": !isActive && !item.isHighlighted
+                  }
+                )}
+              >
+                <item.icon className="h-4 w-4 mr-1.5 flex-shrink-0" />
+                <span>{item.title}</span>
+              </Link>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+  
+  return (
+    <nav className="relative">
+      {useMobileLayout ? (
+        <>
+          {renderMobileMenuButton()}
+          {renderMobileNavPanel()}
+        </>
+      ) : (
+        renderDesktopNav()
+      )}
     </nav>
   );
 }

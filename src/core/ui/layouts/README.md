@@ -141,10 +141,53 @@ This system is designed for future expansion, as new modules can be added by ext
    - Follow the color system for modules
    - Maintain consistent spacing and typography
 
+## Mobile Responsiveness
+
+The layout system now provides enhanced mobile support with granular breakpoints:
+
+```tsx
+// Access detailed breakpoints
+const { isMobile, isTablet, isDesktop, isSmallMobile, isLargeMobile } = useLayout();
+
+// Small mobile: < 480px
+// Large mobile: >= 480px and < 768px
+// Tablet: >= 768px and < 1024px
+// Desktop: >= 1024px
+```
+
+### Mobile-Optimized Features
+
+1. **Responsive Sidebar**
+   - Auto-collapses on mobile screens
+   - Supports touch swipe to close
+   - Overlay backdrop for easy dismissal
+   - Width adjusts to smaller screens
+
+2. **Adaptive Header Navigation**
+   - Transforms into mobile-friendly dropdown menu
+   - Preserves access to all navigation modules
+   - Touch-optimized tap targets
+
+3. **Content Layout Adjustments**
+   - Proper padding scaling for small screens
+   - Typography size adjustments for readability
+   - Touch-friendly spacing between interactive elements
+
+### Mobile Best Practices
+
+- Use progressive enhancement to ensure core functionality works on all devices
+- Apply the `touch-manipulation` CSS property for better touch interactions
+- Implement swipe gestures for intuitive mobile navigation
+- Use `overscroll-contain` to control scroll behavior on iOS
+- Test UI on various screen sizes and in both portrait and landscape
+
 ## Anti-patterns to Avoid
 
 - ❌ **DO NOT** add header/footer directly in app/layout.tsx
 - ❌ **DO NOT** create layout elements outside the layout system
 - ❌ **DO NOT** bypass the layout templates for pages
 - ❌ **DO NOT** implement custom responsive logic outside useLayout
-- ❌ **DO NOT** modify the module system without considering the entire application 
+- ❌ **DO NOT** modify the module system without considering the entire application
+- ❌ **DO NOT** use fixed pixel dimensions that might break on mobile screens
+- ❌ **DO NOT** rely solely on hover states for important interactions
+- ❌ **DO NOT** hide critical functionality on smaller screens 

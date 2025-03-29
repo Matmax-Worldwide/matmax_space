@@ -1,29 +1,30 @@
-import Link from 'next/link';
 import Image from 'next/image';
-import { useLayout } from '../../providers/LayoutProvider';
 import { cn } from '@/src/core/utils/styling';
 
+type LogoProps = {
+  className?: string;
+  alt?: string;
+  darkModeInvert?: boolean;
+};
+
 /**
- * Application logo component
- * Displays a large logo aligned to the left
+ * Logo component for MatMax Wellness Studio
+ * Accepts className for custom styling
  */
-export function Logo() {
-  const { theme } = useLayout();
-  
+export function Logo({ className, alt = "MatMax Wellness Studio", darkModeInvert = false }: LogoProps) {
   return (
-    <Link href="/" className="flex items-center">
-      {/* Large MatMax logo aligned left */}
+    <div className={cn("relative", className)}>
       <Image 
-        src="/logo_mtmx_black-01.svg"
-        alt="MatMax Wellness Studio"
+        src="/logo_mtmx_black-01.svg" 
+        alt={alt}
         width={120}
-        height={120}
+        height={40} 
         className={cn(
-          "transition-opacity p-1",
-          theme === 'dark' ? 'opacity-90 invert' : 'opacity-100'
+          "object-contain",
+          darkModeInvert && "dark:invert"
         )}
       />
-    </Link>
+    </div>
   );
 }
 
