@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 
+// Define types for module configuration
+export type ModuleType = 'main' | 'lms' | 'admin' | 'payments' | 'finance' | 'resources' | 'analytics' | 'support';
+
 // Define types for the layout context
 type LayoutContextType = {
   // Sidebar state
@@ -23,6 +26,10 @@ type LayoutContextType = {
   // Viewport dimensions
   viewportWidth: number;
   viewportHeight: number;
+  
+  // Module management
+  currentModule: ModuleType;
+  setCurrentModule: (module: ModuleType) => void;
   
   // Layout configuration
   layoutType: 'dashboard' | 'minimal' | 'auth' | 'marketing';
@@ -57,8 +64,36 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
   const [viewportWidth, setViewportWidth] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(0);
   
+  // Module state management
+  const [currentModule, setCurrentModule] = useState<ModuleType>('main');
+  
   // Layout type
   const [layoutType, setLayoutType] = useState<'dashboard' | 'minimal' | 'auth' | 'marketing'>('dashboard');
+  
+  // Effect to detect current module from URL path
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const path = window.location.pathname;
+    
+    if (path.startsWith('/dashboard') || path.startsWith('/protected')) {
+      setCurrentModule('main');
+    } else if (path.startsWith('/lms')) {
+      setCurrentModule('lms');
+    } else if (path.startsWith('/admin')) {
+      setCurrentModule('admin');
+    } else if (path.startsWith('/payments')) {
+      setCurrentModule('payments');
+    } else if (path.startsWith('/finance')) {
+      setCurrentModule('finance');
+    } else if (path.startsWith('/resources')) {
+      setCurrentModule('resources');
+    } else if (path.startsWith('/analytics')) {
+      setCurrentModule('analytics');
+    } else if (path.startsWith('/support')) {
+      setCurrentModule('support');
+    }
+  }, []);
   
   // Memoized resize handler for better performance
   const handleResize = useCallback(() => {
@@ -192,6 +227,8 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
         isLandscape,
         viewportWidth,
         viewportHeight,
+        currentModule,
+        setCurrentModule,
         layoutType,
         setLayoutType
       }}

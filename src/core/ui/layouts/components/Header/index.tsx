@@ -1,8 +1,8 @@
 import { ReactNode, useCallback, useState, useEffect, memo } from 'react';
-import { usePathname } from 'next/navigation';
-import { useLayout } from '../../providers/LayoutProvider';
+import { usePathname, useRouter } from 'next/navigation';
+import { useLayout, ModuleType } from '../../providers/LayoutProvider';
 import { cn } from '@/src/core/utils/styling';
-import { ChevronDown, Menu } from 'lucide-react';
+import { ChevronDown, Menu, MoreHorizontal } from 'lucide-react';
 
 // Import the components we need
 import UserMenu from './UserMenu';
@@ -38,6 +38,11 @@ type NavItemType = {
   icon: React.ComponentType<{ className?: string }>;
   color?: string;
   isHighlighted?: boolean;
+  module: ModuleType;
+  children?: {
+    title: string;
+    href: string;
+  }[];
 };
 
 /**
@@ -59,105 +64,137 @@ function Header({
   sticky = true,
   showWalletConnect = true,
 }: HeaderProps) {
-  const { toggleSidebar, isMobile, isTablet, isSmallMobile, isLandscape, layoutType } = useLayout();
+  const { toggleSidebar, isMobile, isTablet, isSmallMobile, isLandscape, layoutType, currentModule, setCurrentModule } = useLayout();
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [subMenuOpen, setSubMenuOpen] = useState<string | null>(null);
   
   // Determine if we're in mobile/tablet view
   const isMobileView = isMobile || isTablet;
   
-  // Navigation items for mobile dropdown - same as desktop navigation
-  // Using useMemo would be better for performance, but keeping it simple for now
+  // Navigation items for mobile dropdown with children - comprehensive module system
   const mobileNavItems: NavItemType[] = [
     {
       title: 'MAIN',
       href: '/dashboard',
       icon: Home,
       color: 'bg-gradient-to-r from-blue-500 to-blue-600',
-      isHighlighted: pathname === '/dashboard' || pathname?.startsWith('/dashboard/'),
+      isHighlighted: currentModule === 'main',
+      module: 'main',
+      children: [
+        { title: 'Dashboard', href: '/dashboard' },
+        { title: 'Protected', href: '/protected' },
+        { title: 'Users', href: '/users' },
+        { title: 'International', href: '/international/countries' }
+      ]
     },
     {
       title: 'LMS',
       href: '/lms',
       icon: GraduationCap,
       color: 'bg-gradient-to-r from-green-500 to-green-600',
-      isHighlighted: pathname === '/lms' || pathname?.startsWith('/lms/'),
+      isHighlighted: currentModule === 'lms',
+      module: 'lms',
+      children: [
+        { title: 'Courses', href: '/lms/courses' },
+        { title: 'Students', href: '/lms/students' },
+        { title: 'Instructors', href: '/lms/instructors' },
+        { title: 'Certifications', href: '/lms/certifications' }
+      ]
     },
     {
       title: 'Admin',
       href: '/admin',
       icon: ShieldCheck,
       color: 'bg-gradient-to-r from-purple-500 to-purple-600',
-      isHighlighted: pathname === '/admin' || pathname?.startsWith('/admin/'),
+      isHighlighted: currentModule === 'admin',
+      module: 'admin',
+      children: [
+        { title: 'Users', href: '/admin/users' },
+        { title: 'Roles', href: '/admin/roles' },
+        { title: 'Permissions', href: '/admin/permissions' },
+        { title: 'Audit Logs', href: '/admin/audit-logs' }
+      ]
     },
     {
       title: 'Payments',
       href: '/payments',
       icon: CreditCard,
       color: 'bg-gradient-to-r from-amber-500 to-amber-600',
-      isHighlighted: pathname === '/payments' || pathname?.startsWith('/payments/'),
+      isHighlighted: currentModule === 'payments',
+      module: 'payments',
+      children: [
+        { title: 'Transactions', href: '/payments/transactions' },
+        { title: 'Subscriptions', href: '/payments/subscriptions' },
+        { title: 'Invoices', href: '/payments/invoices' },
+        { title: 'Methods', href: '/payments/methods' }
+      ]
     },
     {
       title: 'Finance',
       href: '/finance',
       icon: Landmark,
       color: 'bg-gradient-to-r from-sky-500 to-sky-600',
-      isHighlighted: pathname === '/finance' || pathname?.startsWith('/finance/'),
+      isHighlighted: currentModule === 'finance',
+      module: 'finance',
+      children: [
+        { title: 'Reports', href: '/finance/reports' },
+        { title: 'Accounting', href: '/finance/accounting' },
+        { title: 'Budgets', href: '/finance/budgets' },
+        { title: 'Taxes', href: '/finance/taxes' }
+      ]
     },
     {
       title: 'Resources',
       href: '/resources',
       icon: BookOpen,
       color: 'bg-gradient-to-r from-indigo-500 to-indigo-600',
-      isHighlighted: pathname === '/resources' || pathname?.startsWith('/resources/'),
+      isHighlighted: currentModule === 'resources',
+      module: 'resources'
     },
     {
       title: 'Analytics',
       href: '/analytics',
       icon: BarChart,
       color: 'bg-gradient-to-r from-teal-500 to-teal-600',
-      isHighlighted: pathname === '/analytics' || pathname?.startsWith('/analytics/'),
+      isHighlighted: currentModule === 'analytics',
+      module: 'analytics'
     },
     {
       title: 'Support',
       href: '/support',
       icon: Headphones,
       color: 'bg-gradient-to-r from-red-500 to-red-600',
-      isHighlighted: pathname === '/support' || pathname?.startsWith('/support/'),
+      isHighlighted: currentModule === 'support',
+      module: 'support'
     },
   ];
   
-  // Mark '/protected' path as 'MAIN' module
-  if (pathname === '/protected' || pathname?.startsWith('/protected/')) {
-    mobileNavItems[0].isHighlighted = true;
-  }
+  // Handle module change
+  const handleModuleChange = (module: ModuleType, href: string) => {
+    setCurrentModule(module);
+    setMobileNavOpen(false);
+    setSubMenuOpen(null);
+    router.push(href);
+  };
   
-  // Get current active module from navigation items - memoized for performance
+  // Toggle submenu
+  const toggleSubMenu = (title: string) => {
+    setSubMenuOpen(prevState => prevState === title ? null : title);
+  };
+  
+  // Get current active module
   const getCurrentModule = useCallback(() => {
-    const activeModule = mobileNavItems.find(
-      item => item.isHighlighted || 
-      pathname === item.href || 
-      pathname?.startsWith(`${item.href}/`)
-    );
-    
-    return activeModule?.title || 'MAIN';
-  }, [mobileNavItems, pathname]);
-  
-  // Get color for current module - memoized for performance
-  const getCurrentModuleColor = useCallback(() => {
-    const activeModule = mobileNavItems.find(
-      item => item.isHighlighted || 
-      pathname === item.href || 
-      pathname?.startsWith(`${item.href}/`)
-    );
-    
-    return activeModule?.color || 'bg-gradient-to-r from-blue-500 to-blue-600';
-  }, [mobileNavItems, pathname]);
+    const activeModule = mobileNavItems.find(item => item.isHighlighted);
+    return activeModule || mobileNavItems[0];
+  }, [mobileNavItems]);
   
   // Toggle mobile navigation dropdown
   const toggleMobileNav = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     setMobileNavOpen(prev => !prev);
+    setSubMenuOpen(null); // Close any open submenu when toggling the main dropdown
   }, []);
   
   // Close mobile nav when clicking outside
@@ -166,6 +203,7 @@ function Header({
     
     const handleClickOutside = () => {
       setMobileNavOpen(false);
+      setSubMenuOpen(null);
     };
     
     // Delay adding the event listener to avoid immediate triggering
@@ -182,50 +220,92 @@ function Header({
   // Close mobile nav when navigating
   useEffect(() => {
     setMobileNavOpen(false);
+    setSubMenuOpen(null);
   }, [pathname]);
   
-  // Optimize dropdown size for landscape mode
-  const dropdownStyle = isLandscape && isMobileView ? {
-    maxHeight: '50vh'
-  } : {
-    maxHeight: '70vh'
-  };
-  
-  // Memoized dropdown menu items for performance
+  // Memoized dropdown menu items
   const renderMobileNavItems = useCallback(() => {
     return mobileNavItems.map((item) => {
-      const isActive = item.isHighlighted || 
-        pathname === item.href || 
-        pathname?.startsWith(`${item.href}/`);
+      const isActive = item.isHighlighted;
+      const hasChildren = item.children && item.children.length > 0;
+      const isSubMenuOpen = subMenuOpen === item.title;
       
       return (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={cn(
-            "flex items-center px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-neutral-700",
-            isActive ? "bg-primary/5 text-primary font-medium" : "text-foreground"
-          )}
-        >
-          <div className={cn(
-            "w-8 h-8 rounded-full mr-3 flex items-center justify-center",
-            item.color
-          )}>
-            <item.icon className="w-4 h-4 text-white" />
-          </div>
-          <div className="flex flex-col">
-            <span>{item.title}</span>
-            {isActive && (
-              <span className="text-xs text-muted-foreground">Current module</span>
+        <div key={item.href} className="border-b border-border/30 last:border-0">
+          <div 
+            className={cn(
+              "flex items-center px-4 py-3 text-sm justify-between",
+              isActive ? "bg-primary/5" : "",
+              hasChildren ? "cursor-pointer hover:bg-gray-100 dark:hover:bg-neutral-700" : ""
+            )}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (hasChildren) {
+                toggleSubMenu(item.title);
+              } else {
+                handleModuleChange(item.module, item.href);
+              }
+            }}
+          >
+            <div className="flex items-center">
+              <div className={cn(
+                "w-8 h-8 rounded-full mr-3 flex items-center justify-center",
+                item.color
+              )}>
+                <item.icon className="w-4 h-4 text-white" />
+              </div>
+              
+              <div className="flex flex-col">
+                <span className={cn(
+                  "font-medium",
+                  isActive ? "text-primary" : "text-foreground"
+                )}>
+                  {item.title}
+                </span>
+                {isActive && (
+                  <span className="text-xs text-muted-foreground">Current module</span>
+                )}
+              </div>
+            </div>
+            
+            {hasChildren && (
+              <ChevronDown 
+                size={16}
+                className={cn(
+                  "text-muted-foreground transition-transform",
+                  isSubMenuOpen ? "rotate-180" : ""
+                )}
+              />
             )}
           </div>
-          {isActive && (
-            <span className="ml-auto w-2 h-2 rounded-full bg-primary"></span>
+          
+          {/* Render submenu/children if available and open */}
+          {hasChildren && isSubMenuOpen && (
+            <div className="bg-gray-50 dark:bg-neutral-800/50 py-1">
+              {item.children?.map((child) => (
+                <Link
+                  key={child.href}
+                  href={child.href}
+                  className={cn(
+                    "flex items-center px-4 py-2 pl-16 text-sm hover:bg-gray-100 dark:hover:bg-neutral-700",
+                    pathname === child.href ? "text-primary font-medium" : "text-muted-foreground"
+                  )}
+                  onClick={() => {
+                    handleModuleChange(item.module, child.href);
+                  }}
+                >
+                  <span>{child.title}</span>
+                </Link>
+              ))}
+            </div>
           )}
-        </Link>
+        </div>
       );
     });
-  }, [mobileNavItems, pathname]);
+  }, [mobileNavItems, subMenuOpen, pathname, handleModuleChange]);
+  
+  // Get the active module for the current state
+  const activeModule = getCurrentModule();
   
   return (
     <header className={cn(
@@ -266,7 +346,7 @@ function Header({
                 "flex items-center justify-center px-4 py-2 rounded-md text-white font-medium shadow-sm",
                 "transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-primary/30",
                 "will-change-transform active:scale-95 touch-manipulation",
-                getCurrentModuleColor()
+                activeModule?.color?.replace('bg-', '') || 'bg-gradient-to-r from-blue-500 to-blue-600'
               )}
               aria-expanded={mobileNavOpen}
               aria-haspopup="true"
@@ -274,16 +354,10 @@ function Header({
               aria-label="Navigation modules menu"
               style={{ touchAction: 'manipulation' }}
             >
-              {/* Show current module icon */}
-              {mobileNavItems.map((item) => {
-                if (item.title === getCurrentModule()) {
-                  return (
-                    <item.icon key={item.title} className="w-4 h-4 mr-2" />
-                  );
-                }
-                return null;
-              })}
-              <span className="text-sm mr-1">{getCurrentModule()}</span>
+              {activeModule && (
+                <activeModule.icon className="w-4 h-4 mr-2" />
+              )}
+              <span className="text-sm mr-1">{activeModule?.title || 'MAIN'}</span>
               <ChevronDown 
                 size={16} 
                 className={cn(
@@ -298,7 +372,7 @@ function Header({
               <div 
                 id="mobile-module-menu"
                 className={cn(
-                  "absolute right-0 top-full mt-2 w-64 bg-white dark:bg-neutral-800 border border-border rounded-lg shadow-xl z-50 overflow-hidden",
+                  "absolute right-0 top-full mt-2 w-72 bg-white dark:bg-neutral-800 border border-border rounded-lg shadow-xl z-50 overflow-hidden",
                   "animate-in fade-in-50 slide-in-from-top-5 duration-200",
                   // Prevent dropdown from extending beyond viewport
                   "max-h-[80vh]",
@@ -320,7 +394,7 @@ function Header({
                 <div className="py-2 border-b border-border px-4 text-xs font-medium text-muted-foreground uppercase">
                   Modules
                 </div>
-                <div className="overflow-y-auto py-2">
+                <div className="overflow-y-auto divide-y divide-border/30">
                   {renderMobileNavItems()}
                 </div>
               </div>
