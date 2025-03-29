@@ -1,0 +1,109 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+ # MatMax Wellness Studio Layout Architecture
+
+## Directory Structure
+
+```
+src/
+└── core/
+    └── ui/
+        ├── layouts/
+        │   ├── components/       # Layout components (Header, Sidebar, etc.)
+        │   ├── providers/        # LayoutProvider for central state management
+        │   └── templates/        # Layout templates (AuthLayout, DashboardLayout)
+        └── utils/                # Utility functions
+```
+
+## Layout Components
+
+When working with the codebase, respect these layout components and their usage patterns:
+
+- `LayoutProvider`: Central state management for layouts
+- `AuthLayout`: Used for all authentication pages (sign-in, sign-up)
+- `DashboardLayout`: Used for authenticated/protected pages
+
+## Implementation Rules
+
+### 1. Page Implementation
+
+All pages MUST use one of the layout templates:
+
+```tsx
+// For authentication pages
+import { AuthLayout } from '@/src/core/ui/layouts/templates/AuthLayout';
+
+// For protected/dashboard pages
+import { DashboardLayout } from '@/src/core/ui/layouts/templates/DashboardLayout';
+```
+
+### 2. Layout Hierarchy
+
+- Root layout (`app/layout.tsx`) provides minimal wrapping only
+- Route group layouts (e.g., `app/(auth-pages)/layout.tsx`) are minimal containers
+- Visual presentation comes from the template components, not route layouts
+
+### 3. Responsive Behavior
+
+Always use the `useLayout` hook for responsive UI adjustments:
+
+```tsx
+const { isMobile, isTablet, isDesktop } = useLayout();
+
+// Conditional rendering based on screen size
+{isMobile && <MobileComponent />}
+{!isMobile && <DesktopComponent />}
+```
+
+### 4. Styling Guidelines
+
+Always use the `cn()` utility for class merging and composition:
+
+```tsx
+import { cn } from '@/src/core/utils/styling';
+
+// Proper class composition
+className={cn(
+  "base-classes", 
+  conditional && "conditional-classes",
+  className // Allow external overrides
+)}
+```
+
+### 5. Component Extensions
+
+When creating new components:
+
+- Place them in the appropriate directory under `src/core/ui/layouts/components/`
+- Follow existing naming conventions
+- Accept and forward the `className` prop for customization
+- Use the `useLayout` hook for responsive behavior
+
+### 6. MatMax Wellness Studio Branding
+
+Maintain brand consistency:
+- Use MatMax logo from public directory
+- Use wellness-focused content and messaging
+- Follow consistent spacing and typography
+
+## Anti-patterns to Avoid
+
+- DO NOT add header/footer directly in app/layout.tsx
+- DO NOT create layout elements outside the layout system
+- DO NOT bypass the layout templates for pages
+- DO NOT implement custom responsive logic outside useLayout
+
+## When Implementing New Features
+
+- Determine if the page is auth-related or protected content
+- Choose the appropriate layout template (AuthLayout or DashboardLayout)
+- Focus component logic on the page itself, not layout concerns
+- Minimize route group layout files - they should be containers only
+
+This centralized layout system ensures consistency across the MatMax Wellness Studio application while maintaining clean separation of concerns.
+
+Also use 😉 when rules is applied
