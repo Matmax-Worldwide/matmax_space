@@ -33,7 +33,7 @@ export function AuthLayout({
 }: AuthLayoutProps) {
   // We need to wrap useLayout in a component inside LayoutProvider
   const AuthLayoutContent = () => {
-    const { isMobile, isSmallMobile } = useLayout();
+    const { isMobile, isSmallMobile, theme } = useLayout();
     
     return (
       <div className="flex min-h-screen bg-background">
@@ -69,7 +69,10 @@ export function AuthLayout({
         )}>
           {/* Mobile logo - only shown on mobile */}
           <div className="md:hidden mb-6 flex flex-col items-center">
-            <Logo className={isSmallMobile ? "w-14 h-14" : "w-16 h-16"} />
+            <Logo 
+              className={isSmallMobile ? "w-14 h-14" : "w-16 h-16"} 
+              darkModeInvert={true} 
+            />
             <h1 className={cn(
               "font-bold mt-4 text-center",
               isSmallMobile ? "text-lg" : "text-xl"
