@@ -37,6 +37,7 @@ type NavItemType = {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   color?: string;
+  isHighlighted?: boolean;
 };
 
 /**
@@ -79,19 +80,14 @@ export function Header({
   // Determine if we're in mobile/tablet view
   const isMobileView = isMobile || isTablet;
   
-  // Quick navigation items for mobile dropdown
+  // Quick navigation items for mobile dropdown - same as desktop navigation
   const mobileNavItems: NavItemType[] = [
     {
-      title: 'Dashboard',
+      title: 'MAIN',
       href: '/dashboard',
       icon: Home,
       color: 'bg-gradient-to-r from-blue-500 to-blue-600',
-    },
-    {
-      title: 'Protected',
-      href: '/protected',
-      icon: ShieldCheck,
-      color: 'bg-gradient-to-r from-indigo-500 to-indigo-600',
+      isHighlighted: true,
     },
     {
       title: 'LMS',
@@ -137,6 +133,22 @@ export function Header({
     },
   ];
   
+  // Get current active module from navigation items
+  const getCurrentModule = () => {
+    // Find the highlighted module (default to MAIN)
+    const highlightedModule = mobileNavItems.find(item => item.isHighlighted);
+    
+    // If no highlighted module, check which one matches the current path
+    if (!highlightedModule) {
+      const activeModule = mobileNavItems.find(
+        item => pathname === item.href || pathname?.startsWith(`${item.href}/`)
+      );
+      return activeModule?.title || 'MAIN';
+    }
+    
+    return highlightedModule.title;
+  };
+  
   // Toggle mobile navigation dropdown
   const toggleMobileNav = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -176,7 +188,7 @@ export function Header({
         
         {/* Page title on mobile, horizontal nav on desktop */}
         {isMobileView ? (
-          <div className="flex items-center">
+          <div className="flex flex-1 items-center">
             <h1 className="text-lg font-medium">{getPageTitle()}</h1>
           </div>
         ) : (
@@ -185,17 +197,17 @@ export function Header({
       </div>
       
       {/* Right-side header elements */}
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center justify-end space-x-3">
         {/* Mobile navigation dropdown */}
         {isMobileView && layoutType === 'dashboard' && (
           <div className="relative">
             <button
               onClick={toggleMobileNav}
-              className="flex items-center justify-center p-2 rounded-md bg-white dark:bg-neutral-800 border border-border shadow-sm"
+              className="flex items-center justify-center p-2 rounded-md bg-gradient-to-r from-blue-500 to-blue-600 text-white"
               aria-expanded={mobileNavOpen}
               aria-label="Navigation menu"
             >
-              <span className="text-sm font-medium mr-1">Navigate</span>
+              <span className="text-sm font-medium mr-1">{getCurrentModule()}</span>
               <ChevronDown 
                 size={16} 
                 className={cn("transition-transform", mobileNavOpen && "rotate-180")}
@@ -206,7 +218,7 @@ export function Header({
             {mobileNavOpen && (
               <div className="absolute right-0 top-full mt-1 w-56 bg-white dark:bg-neutral-800 border border-border rounded-md shadow-lg z-50 py-1">
                 <div className="py-1 border-b border-border px-3 text-xs font-medium text-muted-foreground uppercase">
-                  Navigation
+                  Modules
                 </div>
                 <div className="max-h-[70vh] overflow-y-auto py-1">
                   {mobileNavItems.map((item) => {
@@ -218,6 +230,7 @@ export function Header({
                         href={item.href}
                         className={cn(
                           "flex items-center px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-neutral-700",
+                          item.isHighlighted ? "font-semibold" : "",
                           isActive ? "bg-primary/5 text-primary font-medium" : "text-foreground"
                         )}
                       >
@@ -228,6 +241,9 @@ export function Header({
                           <item.icon className="w-3.5 h-3.5 text-white" />
                         </div>
                         {item.title}
+                        {isActive && (
+                          <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary"></span>
+                        )}
                       </Link>
                     );
                   })}
