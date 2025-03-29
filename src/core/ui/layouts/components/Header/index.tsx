@@ -1,13 +1,17 @@
-import { ReactNode } from 'react';
-import Link from 'next/link';
+import { ReactNode, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 import { useLayout } from '../../providers/LayoutProvider';
-import { cn } from '../../../../utils/styling';
+import { cn } from '@/src/core/utils/styling';
 import { Menu } from 'lucide-react';
+
+// Import the components we need
 import UserMenu from './UserMenu';
+import HeaderNav from './HeaderNav';
+import LanguageSelector from './LanguageSelector';
+import BlockchainWallet from './BlockchainWallet';
 
 type HeaderProps = {
   className?: string;
-  logo?: ReactNode;
   showMobileMenu?: boolean;
   transparent?: boolean;
   sticky?: boolean;
@@ -16,17 +20,42 @@ type HeaderProps = {
 
 /**
  * Application header component
- * Responsible for navigation, user menu, language selection, and mobile menu
+ * Shows horizontal navigation with menu items on the left
+ * Wallet connect and language selector on the right
+ * Logo is only in the sidebar as per requirements
  */
 export function Header({ 
   className, 
-  logo,
   showMobileMenu = true,
   transparent = false,
   sticky = true,
-  showWalletConnect = true
+  showWalletConnect = true,
 }: HeaderProps) {
-  const { toggleSidebar, isMobile, layoutType } = useLayout();
+  const { toggleSidebar, isMobile, isTablet, layoutType } = useLayout();
+  const pathname = usePathname();
+  
+  // Get current page title from the pathname
+  const getPageTitle = useCallback(() => {
+    if (!pathname) return '';
+    
+    // Remove leading slash and split by segments
+    const segments = pathname.substring(1).split('/');
+    
+    // Return empty string for root path
+    if (segments[0] === '') return '';
+    
+    // Get the last segment that's not empty
+    const lastSegment = segments.filter(Boolean).pop() || '';
+    
+    // Format: convert dash-case or kebab-case to Title Case and remove extension
+    return lastSegment
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }, [pathname]);
+  
+  // Determine if we're in mobile/tablet view
+  const isMobileView = isMobile || isTablet;
   
   return (
     <header className={cn(
@@ -36,32 +65,34 @@ export function Header({
       className
     )}>
       <div className="flex items-center">
-        {/* Mobile menu toggle - only shown on mobile when applicable */}
-        {showMobileMenu && isMobile && layoutType === 'dashboard' && (
+        {/* Mobile menu toggle - only shown on mobile/tablet */}
+        {showMobileMenu && layoutType === 'dashboard' && isMobileView && (
           <button 
             onClick={toggleSidebar}
-            className="mr-2 p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 lg:hidden"
+            className="mr-3 p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
             aria-label="Toggle menu"
           >
             <Menu size={20} />
           </button>
         )}
         
-        {/* Logo - placeholder for now */}
-        <div className="flex items-center">
-          {logo || <span className="font-bold text-xl">MatMax Wellness Studio</span>}
-        </div>
+        {/* Page title on mobile, horizontal nav on desktop */}
+        {isMobileView ? (
+          <h1 className="text-lg font-medium">{getPageTitle()}</h1>
+        ) : (
+          <HeaderNav />
+        )}
       </div>
       
       {/* Right-side header elements */}
-      <div className="flex items-center space-x-2">
-        {showWalletConnect && layoutType !== 'auth' && (
-          <button className="px-3 py-1.5 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-sm">
-            Connect Wallet
-          </button>
-        )}
+      <div className="flex items-center space-x-3">
+        {/* Blockchain wallet connection */}
+        {showWalletConnect && layoutType !== 'auth' && <BlockchainWallet />}
         
-        {/* User menu with logout button */}
+        {/* Language selector */}
+        <LanguageSelector />
+        
+        {/* User menu */}
         <UserMenu />
       </div>
     </header>

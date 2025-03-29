@@ -1,7 +1,8 @@
 import { ReactNode } from 'react';
 import { LayoutProvider } from '../providers/LayoutProvider';
-import { cn } from '../../../utils/styling';
+import { cn } from '@/src/core/utils/styling';
 import Image from 'next/image';
+import Logo from '../components/Header/Logo';
 
 type AuthLayoutProps = {
   children: ReactNode;
@@ -10,6 +11,8 @@ type AuthLayoutProps = {
   footer?: ReactNode;
   showLogo?: boolean;
   contentClassName?: string;
+  imageUrl?: string;
+  imageAlt?: string;
 };
 
 /**
@@ -23,6 +26,8 @@ export function AuthLayout({
   footer,
   showLogo = true,
   contentClassName,
+  imageUrl,
+  imageAlt = "MatMax Wellness Studio"
 }: AuthLayoutProps) {
   return (
     <LayoutProvider>
@@ -32,13 +37,23 @@ export function AuthLayout({
           <div className="max-w-md text-center">
             {showLogo && (
               <div className="mb-8 flex justify-center">
-                <Image 
-                  src="/logo_mtmx_black-01.svg" 
-                  alt="MatMax Wellness Studio" 
-                  width={200} 
-                  height={80}
-                  style={{ objectFit: 'contain' }}
-                />
+                {imageUrl ? (
+                  <Image 
+                    src={imageUrl} 
+                    alt={imageAlt} 
+                    width={200} 
+                    height={80}
+                    style={{ objectFit: 'contain' }}
+                  />
+                ) : (
+                  <Image 
+                    src="/logo_mtmx_black-01.svg" 
+                    alt="MatMax Wellness Studio" 
+                    width={200} 
+                    height={80}
+                    style={{ objectFit: 'contain' }}
+                  />
+                )}
               </div>
             )}
             <h1 className="text-3xl font-bold mb-4">MatMax Wellness Studio</h1>
@@ -51,14 +66,8 @@ export function AuthLayout({
         {/* Right side - Authentication form */}
         <div className="flex-1 flex flex-col justify-center items-center p-8">
           {/* Mobile logo - only shown on mobile */}
-          <div className="md:hidden mb-8 flex justify-center">
-            <Image 
-              src="/logo_mtmx_black-01.svg" 
-              alt="MatMax Wellness Studio" 
-              width={150} 
-              height={60}
-              style={{ objectFit: 'contain' }}
-            />
+          <div className="md:hidden mb-8 flex flex-col items-center">
+            <Logo />
             <h1 className="text-xl font-bold mt-4">MatMax Wellness Studio</h1>
           </div>
           

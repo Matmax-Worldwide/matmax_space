@@ -1,7 +1,10 @@
 import { ReactNode, useEffect } from 'react';
 import { useLayout } from '../../providers/LayoutProvider';
-import { cn } from '../../../../utils/styling';
+import { cn } from '@/src/core/utils/styling';
 import { X } from 'lucide-react';
+import Logo from '../Header/Logo';
+import SidebarNav from './SidebarNav';
+import SidebarFooter from './SidebarFooter';
 
 type SidebarProps = {
   className?: string;
@@ -49,14 +52,20 @@ export function Sidebar({ className, children, showLogo = true }: SidebarProps) 
           className
         )}
       >
-        {/* Sidebar header with logo and close button */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-border">
-          {showLogo ? <span className="font-bold text-xl">GlobalApp</span> : <h2 className="text-lg font-semibold">Menu</h2>}
+        {/* Sidebar header with logo aligned left */}
+        <div className="flex items-center px-4 py-6 border-b border-border">
+          {showLogo ? (
+            <div className="flex justify-start">
+              <Logo />
+            </div>
+          ) : (
+            <h2 className="text-lg font-semibold">Menu</h2>
+          )}
           
           {isMobile && (
             <button
               onClick={() => setSidebarOpen(false)}
-              className="p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              className="absolute right-4 top-4 p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
               aria-label="Close sidebar"
             >
               <X size={20} />
@@ -66,36 +75,11 @@ export function Sidebar({ className, children, showLogo = true }: SidebarProps) 
         
         {/* Sidebar content */}
         <div className="flex-1 overflow-y-auto py-4">
-          {children || (
-            <nav className="px-2">
-              <ul className="space-y-1">
-                {/* Placeholder navigation items */}
-                <li>
-                  <a href="/dashboard" className="flex items-center px-3 py-2 text-sm rounded-md bg-primary/10 text-primary">
-                    <span>Dashboard</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="/international" className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800">
-                    <span>International</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="/blockchain" className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800">
-                    <span>Blockchain</span>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-          )}
+          {children || <SidebarNav />}
         </div>
         
         {/* Sidebar footer */}
-        <div className="border-t border-border p-4">
-          <div className="text-xs text-muted-foreground">
-            <p>© 2023 GlobalApp Inc.</p>
-          </div>
-        </div>
+        <SidebarFooter />
       </aside>
     </>
   );
