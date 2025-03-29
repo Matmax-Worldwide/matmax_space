@@ -186,7 +186,7 @@ export function Header({
         
         {/* Horizontal nav on desktop, empty space on mobile */}
         {isMobileView ? (
-          <div className="flex-1"></div> {/* No page title, just empty space */}
+          <div className="flex-1">{/* No page title, just empty space */}</div>
         ) : (
           <HeaderNav />
         )}
@@ -200,26 +200,36 @@ export function Header({
             <button
               onClick={toggleMobileNav}
               className={cn(
-                "flex items-center justify-center px-3 py-2 rounded-md text-white",
+                "flex items-center justify-center px-4 py-2 rounded-md text-white font-medium shadow-sm",
+                "transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-primary/30",
                 getCurrentModuleColor()
               )}
               aria-expanded={mobileNavOpen}
               aria-label="Navigation menu"
             >
-              <span className="text-sm font-medium mr-1">{getCurrentModule()}</span>
+              {/* Show current module icon */}
+              {mobileNavItems.map((item) => {
+                if (item.title === getCurrentModule()) {
+                  return (
+                    <item.icon key={item.title} className="w-4 h-4 mr-2" />
+                  );
+                }
+                return null;
+              })}
+              <span className="text-sm mr-1">{getCurrentModule()}</span>
               <ChevronDown 
                 size={16} 
-                className={cn("transition-transform", mobileNavOpen && "rotate-180")}
+                className={cn("transition-transform duration-200", mobileNavOpen && "rotate-180")}
               />
             </button>
             
             {/* Mobile navigation dropdown */}
             {mobileNavOpen && (
-              <div className="absolute right-0 top-full mt-1 w-56 bg-white dark:bg-neutral-800 border border-border rounded-md shadow-lg z-50 py-1">
-                <div className="py-1 border-b border-border px-3 text-xs font-medium text-muted-foreground uppercase">
+              <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-neutral-800 border border-border rounded-lg shadow-xl z-50 overflow-hidden">
+                <div className="py-2 border-b border-border px-4 text-xs font-medium text-muted-foreground uppercase">
                   Modules
                 </div>
-                <div className="max-h-[70vh] overflow-y-auto py-1">
+                <div className="max-h-[70vh] overflow-y-auto py-2">
                   {mobileNavItems.map((item) => {
                     const isActive = item.isHighlighted || 
                       pathname === item.href || 
@@ -230,19 +240,24 @@ export function Header({
                         key={item.href}
                         href={item.href}
                         className={cn(
-                          "flex items-center px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-neutral-700",
+                          "flex items-center px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-neutral-700",
                           isActive ? "bg-primary/5 text-primary font-medium" : "text-foreground"
                         )}
                       >
                         <div className={cn(
-                          "w-6 h-6 rounded-full mr-2 flex items-center justify-center",
+                          "w-8 h-8 rounded-full mr-3 flex items-center justify-center",
                           item.color
                         )}>
-                          <item.icon className="w-3.5 h-3.5 text-white" />
+                          <item.icon className="w-4 h-4 text-white" />
                         </div>
-                        {item.title}
+                        <div className="flex flex-col">
+                          <span>{item.title}</span>
+                          {isActive && (
+                            <span className="text-xs text-muted-foreground">Current module</span>
+                          )}
+                        </div>
                         {isActive && (
-                          <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary"></span>
+                          <span className="ml-auto w-2 h-2 rounded-full bg-primary"></span>
                         )}
                       </Link>
                     );
