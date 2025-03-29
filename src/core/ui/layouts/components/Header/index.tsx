@@ -299,14 +299,28 @@ function Header({
                 id="mobile-module-menu"
                 className={cn(
                   "absolute right-0 top-full mt-2 w-64 bg-white dark:bg-neutral-800 border border-border rounded-lg shadow-xl z-50 overflow-hidden",
-                  "animate-in fade-in-50 slide-in-from-top-5 duration-200"
+                  "animate-in fade-in-50 slide-in-from-top-5 duration-200",
+                  // Prevent dropdown from extending beyond viewport
+                  "max-h-[80vh]",
+                  // Position dropdown to stay in viewport
+                  isSmallMobile && "right-0 left-auto transform-none"
                 )}
+                style={{
+                  maxHeight: 'min(80vh, 500px)',
+                  overflowY: 'auto',
+                  // Ensure dropdown stays within screen boundaries
+                  ...(isLandscape ? { 
+                    maxHeight: 'min(70vh, 400px)',
+                    right: 0,
+                    left: 'auto'
+                  } : {})
+                }}
                 role="menu"
               >
                 <div className="py-2 border-b border-border px-4 text-xs font-medium text-muted-foreground uppercase">
                   Modules
                 </div>
-                <div className="overflow-y-auto py-2" style={dropdownStyle}>
+                <div className="overflow-y-auto py-2">
                   {renderMobileNavItems()}
                 </div>
               </div>
