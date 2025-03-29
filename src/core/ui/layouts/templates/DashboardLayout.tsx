@@ -1,10 +1,11 @@
-import { ReactNode } from 'react';
+import { ReactNode, memo } from 'react';
 import { LayoutProvider } from '../providers/LayoutProvider';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import Footer from '../components/Footer';
 import PageContainer from '../components/Content/PageContainer';
 import { cn } from '@/src/core/utils/styling';
+import { useLayout } from '../providers/LayoutProvider';
 
 type DashboardLayoutProps = {
   children: ReactNode;
@@ -18,8 +19,9 @@ type DashboardLayoutProps = {
 /**
  * Dashboard layout template
  * Main layout for authenticated sections of the application
+ * Optimized for mobile with responsive layout adaptations and performance enhancements
  */
-export function DashboardLayout({
+function DashboardLayout({
   children,
   showSidebar = true,
   showFooter = true,
@@ -29,35 +31,82 @@ export function DashboardLayout({
 }: DashboardLayoutProps) {
   return (
     <LayoutProvider>
-      <div className="flex min-h-screen bg-background">
-        {/* Sidebar - conditionally rendered */}
-        {showSidebar && <Sidebar />}
-        
-        {/* Main content area */}
-        <div className={cn(
-          "flex flex-col w-full transition-all duration-300",
-          showSidebar && "md:ml-64" // Offset for the sidebar
-        )}>
-          {/* Header */}
-          <Header />
-          
-          {/* Main content */}
-          <main className="flex-1">
-            <PageContainer 
-              className={contentClassName}
-              maxWidth={maxWidth}
-              padding={padding}
-            >
-              {children}
-            </PageContainer>
-          </main>
-          
-          {/* Footer - conditionally rendered */}
-          {showFooter && <Footer />}
-        </div>
-      </div>
+      <DashboardLayoutContent
+        showSidebar={showSidebar}
+        showFooter={showFooter}
+        contentClassName={contentClassName}
+        maxWidth={maxWidth}
+        padding={padding}
+      >
+        {children}
+      </DashboardLayoutContent>
     </LayoutProvider>
   );
 }
 
-export default DashboardLayout; 
+// Separate component to use the useLayout hook
+const DashboardLayoutContent = ({
+  children,
+  showSidebar,
+  showFooter,
+  contentClassName,
+  maxWidth,
+  padding
+}: DashboardLayoutProps) => {
+  const { isMobile, isLandscape, isPortrait, viewportHeight } = useLayout();
+  
+  // Handle specially small viewport heights in landscape mode
+  const isCompactLayout = isLandscape && viewportHeight < 600;
+  
+  return (
+    <div 
+      className={cn(
+        "flex min-h-screen bg-background will-change-contents",
+        // For small screens in landscape, use a more compact layout
+        isCompactLayout && "overflow-auto"
+      )}
+    >
+      {/* Sidebar - conditionally rendered */}
+      {showSidebar && <Sidebar />}
+      
+      {/* Main content area */}
+      <div 
+        className={cn(
+          "flex flex-col w-full transition-all duration-300",
+          showSidebar && "md:ml-64", // Offset for the sidebar
+          // Use hardware acceleration for smoother transitions
+          "will-change-transform backface-visibility-hidden"
+        )}
+      >
+        {/* Header with sticky positioning */}
+        <Header />
+        
+        {/* Main content with flex grow */}
+        <main 
+          className={cn(
+            "flex-1",
+            // Optimize main container for smaller screens
+            isCompactLayout ? "overflow-auto" : ""
+          )}
+        >
+          <PageContainer 
+            className={contentClassName}
+            maxWidth={maxWidth}
+            padding={padding}
+          >
+            {children}
+          </PageContainer>
+        </main>
+        
+        {/* Footer - conditionally rendered and optimized for mobile */}
+        {showFooter && <Footer className={isCompactLayout ? "py-3" : ""} />}
+      </div>
+    </div>
+  );
+};
+
+// Use memo for performance optimization
+export default memo(DashboardLayout);
+
+// Also export as named component
+export { DashboardLayout }; 
