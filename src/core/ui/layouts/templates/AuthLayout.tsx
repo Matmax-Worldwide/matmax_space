@@ -125,7 +125,7 @@ export function AuthLayout({
               )}>
                 MatMax Wellness Studio
               </h1>
-              <p className="text-lg max-w-md text-white opacity-90 mt-2">
+              <p className="text-lg max-w-md text-white opacity-90 mt-2 text-center">
                 welcome to our universe
               </p>
             </div>
@@ -694,20 +694,58 @@ export function AuthLayout({
             .spiral-galaxy {
               width: 150px;
               height: 150px;
+              left: 50%;
+              top: 45%;
             }
             
-            .supernova-1, .supernova-2, .supernova-3 {
+            .supernova-1 {
               transform-origin: center;
-              /* Make supernovas slightly smaller on mobile */
               transform: scale(0.8);
+              left: 40%;
+              top: 30%;
+            }
+            
+            .supernova-2 {
+              transform-origin: center;
+              transform: scale(0.8);
+              left: 55%;
+              top: 55%;
+            }
+            
+            .supernova-3 {
+              transform-origin: center;
+              transform: scale(0.8);
+              left: 45%;
+              top: 20%;
             }
             
             .galaxies {
               background-size: 400px 400px;
+              background-position: center;
             }
             
             .star-clusters {
               background-size: 600px 600px;
+              background-position: center;
+            }
+            
+            .aurora {
+              bottom: 0;
+              opacity: 0.25;
+            }
+            
+            .comets::before {
+              left: 10%;
+              top: 25%;
+            }
+            
+            .comets::after {
+              left: 40%;
+              top: 60%;
+            }
+            
+            .nebula-1, .nebula-2 {
+              background-position: center;
             }
           }
         `}</style>
