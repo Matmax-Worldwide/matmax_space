@@ -505,6 +505,14 @@ function Header({
           role: "Administrator",
           avatar: "/images/avatar.jpg"
         }}
+        currentSectionId={currentSectionData.section}
+        onSectionSelect={(sectionId) => {
+          setActiveSection(sectionId);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('activeSection', sectionId);
+          }
+          router.push(`/protected?section=${sectionId}`);
+        }}
       />
       
       {/* Module Menu */}

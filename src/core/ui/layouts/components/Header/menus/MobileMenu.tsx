@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Book, LucideIcon, School, ShoppingBag, BarChart3, CreditCard } from 'lucide-react';
 import { useLayout } from '../../../providers/LayoutProvider';
 import { cn } from '@/src/core/utils/styling';
 
@@ -9,7 +10,7 @@ type MobileMenuProps = {
   isOpen: boolean;
   onClose: () => void;
   mobileMenuVisible: boolean;
-  sidebarItems: {
+  sidebarItems?: {
     title: string;
     href: string;
     icon: React.ReactNode;
@@ -20,6 +21,8 @@ type MobileMenuProps = {
     role: string;
     avatar: string;
   };
+  currentSectionId?: string;
+  onSectionSelect?: (section: string) => void;
 };
 
 /**
@@ -32,15 +35,80 @@ export function MobileMenu({
   mobileMenuVisible,
   sidebarItems,
   notificationCount,
-  userProfile
+  userProfile,
+  currentSectionId = 'main',
+  onSectionSelect
 }: MobileMenuProps) {
   if (!isOpen) return null;
   
   const router = useRouter();
   
+  // Module sections - matching the ModuleMenu structure
+  const SECTIONS = [
+    {
+      id: 'main',
+      title: 'Main Dashboard',
+      icon: BarChart3,
+      color: 'from-blue-500 to-blue-700',
+      textColor: 'text-blue-500',
+      description: 'Your dashboard overview and analytics.',
+    },
+    {
+      id: 'lms',
+      title: 'Learning Management',
+      icon: School,
+      color: 'from-green-500 to-green-700',
+      textColor: 'text-green-500',
+      description: 'Courses, lessons and educational content.',
+    },
+    {
+      id: 'admin',
+      title: 'Admin Panel',
+      icon: Book,
+      color: 'from-purple-500 to-purple-700',
+      textColor: 'text-purple-500',
+      description: 'User management and system settings.',
+    },
+    {
+      id: 'payments',
+      title: 'Payments',
+      icon: CreditCard,
+      color: 'from-amber-500 to-amber-700',
+      textColor: 'text-amber-500',
+      description: 'Transactions, billing and payment history.',
+    },
+    {
+      id: 'finance',
+      title: 'Finance',
+      icon: BarChart3,
+      color: 'from-red-500 to-red-700',
+      textColor: 'text-red-500',
+      description: 'Financial reporting and analytics.',
+    },
+    {
+      id: 'store',
+      title: 'Store',
+      icon: ShoppingBag,
+      color: 'from-sky-500 to-sky-700',
+      textColor: 'text-sky-500',
+      description: 'Products, purchases, and marketplace.',
+    },
+  ];
+  
   const handleNavigation = (href: string) => {
     router.push(href);
     onClose();
+  };
+  
+  const handleSectionClick = (sectionId: string) => {
+    if (onSectionSelect) {
+      onSectionSelect(sectionId);
+      onClose();
+    } else {
+      // Fallback to direct navigation
+      router.push(`/protected?section=${sectionId}`);
+      onClose();
+    }
   };
   
   return (
@@ -97,28 +165,77 @@ export function MobileMenu({
           </div>
         </div>
         
-        {/* Navigation */}
+        {/* Modules/Sections Navigation */}
         <div className="flex-1 overflow-y-auto">
           <div className="p-4">
-            <p className="text-xs uppercase font-semibold text-muted-foreground mb-3 pl-2">Navigation</p>
-            <div className="space-y-1">
-              {sidebarItems.map((item, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleNavigation(item.href)}
-                  className="flex items-center w-full p-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200 transform hover:scale-[1.02]"
-                  style={{
-                    transitionDelay: `${index * 50}ms`,
-                    opacity: mobileMenuVisible ? 1 : 0,
-                    transform: mobileMenuVisible ? 'translateX(0)' : 'translateX(20px)'
-                  }}
-                >
-                  <span className="mr-3">{item.icon}</span>
-                  <span>{item.title}</span>
-                </button>
-              ))}
+            <p className="text-xs uppercase font-semibold text-muted-foreground mb-3 pl-2">Modules</p>
+            <div className="space-y-3">
+              {SECTIONS.map((section, index) => {
+                const Icon = section.icon;
+                const isActive = section.id.toLowerCase() === currentSectionId?.toLowerCase();
+                
+                return (
+                  <button
+                    key={section.id}
+                    onClick={() => handleSectionClick(section.id)}
+                    className={cn(
+                      "flex items-center w-full p-3 rounded-lg border transition-all duration-200",
+                      isActive
+                        ? "bg-neutral-100 dark:bg-neutral-800 border-primary"
+                        : "border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800/70"
+                    )}
+                    style={{
+                      transitionDelay: `${index * 50}ms`,
+                      opacity: mobileMenuVisible ? 1 : 0,
+                      transform: mobileMenuVisible ? 'translateX(0)' : 'translateX(20px)'
+                    }}
+                  >
+                    <div className={cn(
+                      "w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br mr-3 transition-transform duration-300 hover:scale-110",
+                      section.color
+                    )}>
+                      <Icon className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className={cn(
+                        "font-medium transition-colors duration-200",
+                        isActive ? section.textColor : ""
+                      )}>
+                        {section.title}
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        {section.description}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
+          
+          {/* Additional navigation items */}
+          {sidebarItems && sidebarItems.length > 0 && (
+            <div className="p-4 pt-0">
+              <p className="text-xs uppercase font-semibold text-muted-foreground mb-3 pl-2">Navigation</p>
+              <div className="space-y-1">
+                {sidebarItems.map((item, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleNavigation(item.href)}
+                    className="flex items-center w-full p-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200 transform hover:scale-[1.02]"
+                    style={{
+                      transitionDelay: `${(index + SECTIONS.length) * 30}ms`,
+                      opacity: mobileMenuVisible ? 1 : 0,
+                      transform: mobileMenuVisible ? 'translateX(0)' : 'translateX(20px)'
+                    }}
+                  >
+                    <span className="mr-3">{item.icon}</span>
+                    <span>{item.title}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         
         {/* Footer Links */}
