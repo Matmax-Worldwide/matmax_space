@@ -36,48 +36,48 @@ export function ModuleMenu({
       title: 'Main Dashboard',
       icon: BarChart3,
       color: 'from-blue-500 to-blue-700',
+      bgColor: 'bg-blue-500',
       textColor: 'text-blue-500',
-      description: 'Your dashboard overview and analytics.',
     },
     {
       id: 'lms',
       title: 'Learning Management',
       icon: School,
       color: 'from-green-500 to-green-700',
+      bgColor: 'bg-green-500',
       textColor: 'text-green-500',
-      description: 'Courses, lessons and educational content.',
     },
     {
       id: 'admin',
       title: 'Admin Panel',
       icon: Book,
       color: 'from-purple-500 to-purple-700',
+      bgColor: 'bg-purple-500',
       textColor: 'text-purple-500',
-      description: 'User management and system settings.',
     },
     {
       id: 'payments',
       title: 'Payments',
       icon: CreditCard,
       color: 'from-amber-500 to-amber-700',
+      bgColor: 'bg-amber-500',
       textColor: 'text-amber-500',
-      description: 'Transactions, billing and payment history.',
     },
     {
       id: 'finance',
       title: 'Finance',
       icon: BarChart3,
       color: 'from-red-500 to-red-700',
+      bgColor: 'bg-red-500',
       textColor: 'text-red-500',
-      description: 'Financial reporting and analytics.',
     },
     {
       id: 'store',
       title: 'Store',
       icon: ShoppingBag,
       color: 'from-sky-500 to-sky-700',
+      bgColor: 'bg-sky-500',
       textColor: 'text-sky-500',
-      description: 'Products, purchases, and marketplace.',
     },
   ];
   
@@ -137,7 +137,7 @@ export function ModuleMenu({
                       key={section.id}
                       onClick={() => handleSectionClick(section.id)}
                       className={cn(
-                        "flex flex-col w-full p-4 rounded-lg border transition-all duration-200",
+                        "flex items-center w-full p-4 rounded-lg border transition-all duration-200",
                         isActive
                           ? "bg-neutral-100 dark:bg-neutral-800 border-primary"
                           : "border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800/70"
@@ -148,23 +148,18 @@ export function ModuleMenu({
                         transform: moduleMenuVisible ? 'translateY(0)' : 'translateY(20px)'
                       }}
                     >
-                      <div className="flex items-center mb-2">
-                        <div className={cn(
-                          "w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br mr-3 transition-transform duration-300 hover:scale-110",
-                          section.color
-                        )}>
-                          <Icon className="h-5 w-5 text-white" />
-                        </div>
-                        <h3 className={cn(
-                          "font-semibold text-lg transition-colors duration-200",
-                          isActive ? section.textColor : ""
-                        )}>
-                          {section.title}
-                        </h3>
+                      <div className={cn(
+                        "w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br mr-3 transition-transform duration-300 hover:scale-110",
+                        section.color
+                      )}>
+                        <Icon className="h-5 w-5 text-white" />
                       </div>
-                      <p className="text-sm text-muted-foreground pl-12">
-                        {section.description}
-                      </p>
+                      <h3 className={cn(
+                        "font-semibold text-lg transition-colors duration-200",
+                        isActive ? section.textColor : ""
+                      )}>
+                        {section.title}
+                      </h3>
                     </button>
                   );
                 })}
@@ -217,7 +212,7 @@ export function ModuleMenu({
                     key={section.id}
                     onClick={() => handleSectionClick(section.id)}
                     className={cn(
-                      "flex flex-col p-4 rounded-lg border transition-all duration-200 hover:shadow-md",
+                      "flex items-center p-4 rounded-lg border transition-all duration-200 hover:shadow-md",
                       isActive 
                         ? "bg-neutral-100 dark:bg-neutral-800 border-primary" 
                         : "border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800/70"
@@ -228,23 +223,18 @@ export function ModuleMenu({
                       transform: moduleMenuVisible ? 'translateY(0)' : 'translateY(10px)'
                     }}
                   >
-                    <div className="flex items-center mb-2">
-                      <div className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br mr-3 transition-transform duration-300 hover:scale-110",
-                        section.color
-                      )}>
-                        <Icon className="h-5 w-5 text-white" />
-                      </div>
-                      <h3 className={cn(
-                        "font-semibold transition-colors duration-200",
-                        isActive ? section.textColor : ""
-                      )}>
-                        {section.title}
-                      </h3>
+                    <div className={cn(
+                      "w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br mr-3 transition-transform duration-300 hover:scale-110",
+                      section.color
+                    )}>
+                      <Icon className="h-5 w-5 text-white" />
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {section.description}
-                    </p>
+                    <h3 className={cn(
+                      "font-semibold transition-colors duration-200",
+                      isActive ? section.textColor : ""
+                    )}>
+                      {section.title}
+                    </h3>
                   </button>
                 );
               })}
