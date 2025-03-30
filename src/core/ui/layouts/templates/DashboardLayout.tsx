@@ -69,34 +69,56 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
       />
       
       {/* Main layout container with sidebar and content */}
-      <div className="flex flex-1 overflow-hidden pt-[64px]">
-        {/* Sidebar - Fixed on desktop, overlay on mobile */}
-        <Sidebar 
-          isOpen={isSidebarOpen} 
-          toggleSidebar={toggleSidebar}
-          showLogo={false}
-        />
-        
-        {/* Main content area with proper margin based on sidebar state */}
-        <main 
-          className={cn(
-            "flex-1 overflow-auto transition-all duration-300 ease-in-out",
-            isMobile ? "w-full" : "",
-            !isMobile && isSidebarOpen 
-              ? sidebarExpanded 
-                ? "ml-[240px]" 
-                : "ml-[60px]"
-              : !isMobile ? "ml-[60px]" : ""
-          )}
-        >
-          <div className="max-w-7xl mx-auto p-4 md:p-6 min-h-[calc(100vh-64px)]">
-            {children}
-          </div>
+      {isMobile ? (
+        // Mobile-specific container without the extra top padding
+        <div className="flex flex-1 overflow-hidden">
+          {/* Sidebar - overlay on mobile */}
+          <Sidebar 
+            isOpen={isSidebarOpen} 
+            toggleSidebar={toggleSidebar}
+            showLogo={false}
+          />
           
-          {/* Footer */}
-          <Footer />
-        </main>
-      </div>
+          {/* Main content area for mobile */}
+          <main className="flex-1 overflow-auto transition-all duration-300 ease-in-out w-full">
+            <div className="max-w-7xl mx-auto p-4 md:p-6 min-h-[calc(100vh-64px)]">
+              {children}
+            </div>
+            
+            {/* Footer */}
+            <Footer />
+          </main>
+        </div>
+      ) : (
+        // Desktop container with the padding for header space
+        <div className="flex flex-1 overflow-hidden pt-[64px]">
+          {/* Sidebar - Fixed on desktop */}
+          <Sidebar 
+            isOpen={isSidebarOpen} 
+            toggleSidebar={toggleSidebar}
+            showLogo={false}
+          />
+          
+          {/* Main content area with proper margin based on sidebar state */}
+          <main 
+            className={cn(
+              "flex-1 overflow-auto transition-all duration-300 ease-in-out",
+              !isMobile && isSidebarOpen 
+                ? sidebarExpanded 
+                  ? "ml-[240px]" 
+                  : "ml-[60px]"
+                : !isMobile ? "ml-[60px]" : ""
+            )}
+          >
+            <div className="max-w-7xl mx-auto p-4 md:p-6 min-h-[calc(100vh-64px)]">
+              {children}
+            </div>
+            
+            {/* Footer */}
+            <Footer />
+          </main>
+        </div>
+      )}
     </div>
   );
 }
