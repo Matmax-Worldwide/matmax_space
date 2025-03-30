@@ -61,6 +61,7 @@ const LayoutContext = createContext<LayoutContextType>({
   viewportHeight: 1080,
   theme: 'light',
   isSmallMobile: false,
+  isLargeMobile: false,
   scrollY: 0,
   isSidebarOpen: true,
   toggleSidebar: () => {},
@@ -72,6 +73,9 @@ const LayoutContext = createContext<LayoutContextType>({
   setActiveSection: () => {},
   layoutType: 'dashboard',
   setLayoutType: () => {},
+  sidebarOpen: false,
+  setSidebarOpen: () => {},
+  setTheme: () => {},
 });
 
 /**
@@ -285,10 +289,8 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
         setActiveSection,
         layoutType,
         setLayoutType,
-        isSidebarOpen,
-        setIsSidebarOpen,
+        isSidebarOpen: sidebarOpen,
         layoutId,
-        setLayoutId,
         route,
         scrollY: 0,
       }}

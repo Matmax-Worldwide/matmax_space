@@ -31,6 +31,8 @@ type HeaderProps = {
   transparent?: boolean;
   sticky?: boolean;
   showWalletConnect?: boolean;
+  toggleSidebar?: () => void;
+  isSidebarOpen?: boolean;
 };
 
 // Navigation item type definition (simplified from HeaderNav)
@@ -65,9 +67,11 @@ function Header({
   transparent = false,
   sticky = true,
   showWalletConnect = true,
+  toggleSidebar,
+  isSidebarOpen,
 }: HeaderProps) {
   const router = useRouter();
-  const { toggleSidebar, isMobile, isTablet, isSmallMobile, isLandscape, layoutType, currentModule, setCurrentModule } = useLayout();
+  const { isMobile, isTablet, isSmallMobile, isLandscape, layoutType, currentModule, setCurrentModule } = useLayout();
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [subMenuOpen, setSubMenuOpen] = useState<string | null>(null);
