@@ -54,19 +54,20 @@ export function BlockchainWallet() {
         // Connected wallet state
         <button
           onClick={() => setOpen(!open)}
-          className="flex items-center px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-sm h-8"
+          className="flex items-center px-2 md:px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-xs md:text-sm h-8"
         >
-          <Wallet className="w-4 h-4 mr-2" />
-          <span>{formatAddress(walletAddress)}</span>
+          <Wallet className="w-4 h-4 mr-1 md:mr-2" />
+          <span className="hidden sm:inline">{formatAddress(walletAddress)}</span>
         </button>
       ) : (
         // Disconnected wallet state
         <button
           onClick={connectWallet}
-          className="flex items-center px-3 py-1.5 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-sm h-8"
+          className="flex items-center px-2 md:px-3 py-1.5 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-xs md:text-sm h-8"
         >
-          <Wallet className="w-4 h-4 mr-2" />
-          <span>Connect Wallet</span>
+          <Wallet className="w-4 h-4 mr-1 md:mr-2" />
+          <span className="hidden xs:inline">Connect</span>
+          <span className="hidden sm:inline"> Wallet</span>
         </button>
       )}
       

@@ -316,7 +316,7 @@ function Header({
   
   return (
     <header className={cn(
-      "w-full h-16 flex items-center justify-between px-4",
+      "w-full h-16 flex items-center justify-between px-4 md:px-6 lg:px-8 overflow-hidden",
       sticky && "sticky top-0 z-40",
       transparent ? "bg-transparent" : "bg-background border-b border-border",
       className
@@ -343,14 +343,14 @@ function Header({
       </div>
       
       {/* Right-side header elements */}
-      <div className="flex items-center justify-end space-x-3">
+      <div className="flex items-center justify-end space-x-2 md:space-x-3 overflow-hidden">
         {/* Mobile navigation dropdown */}
         {isMobileView && layoutType === 'dashboard' && (
           <div className="relative h-10 flex items-center">
             <button
               onClick={toggleMobileNav}
               className={cn(
-                "flex items-center justify-center px-4 py-2 rounded-md text-white font-medium shadow-sm h-10",
+                "flex items-center justify-center px-2 sm:px-4 py-2 rounded-md text-white font-medium shadow-sm h-10 max-w-[120px] sm:max-w-none overflow-hidden",
                 "transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-primary/30",
                 "will-change-transform active:scale-95 touch-manipulation",
                 activeModule?.color?.replace('bg-', '') || 'bg-gradient-to-r from-blue-500 to-blue-600'
@@ -362,13 +362,13 @@ function Header({
               style={{ touchAction: 'manipulation' }}
             >
               {activeModule && (
-                <activeModule.icon className="w-4 h-4 mr-2" />
+                <activeModule.icon className="w-4 h-4 mr-1 sm:mr-2 flex-shrink-0" />
               )}
-              <span className="text-sm mr-1">{activeModule?.title || 'MAIN'}</span>
+              <span className="text-xs sm:text-sm mr-1 truncate">{activeModule?.title || 'MAIN'}</span>
               <ChevronDown 
                 size={16} 
                 className={cn(
-                  "transition-transform duration-200 will-change-transform", 
+                  "transition-transform duration-200 will-change-transform flex-shrink-0", 
                   mobileNavOpen && "rotate-180"
                 )}
               />
