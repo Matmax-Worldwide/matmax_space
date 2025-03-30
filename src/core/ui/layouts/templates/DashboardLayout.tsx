@@ -70,8 +70,8 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
       
       {/* Main layout container with sidebar and content */}
       {isMobile ? (
-        // Mobile-specific container without the extra top padding
-        <div className="flex flex-1 overflow-hidden">
+        // Mobile-specific container with padding-top to account for fixed header
+        <div className="flex flex-1 overflow-hidden pt-16">
           {/* Sidebar - overlay on mobile */}
           <Sidebar 
             isOpen={isSidebarOpen} 

@@ -320,8 +320,8 @@ function Header({
   return (
     <header className={cn(
       'w-full h-16 bg-white dark:bg-neutral-900 border-b border-border flex items-center justify-between px-4 z-20',
-      // For mobile: use absolute positioning instead of fixed, to avoid creating extra space
-      isMobileView ? 'absolute top-0 left-0 right-0' : 'fixed top-0 left-0 right-0',
+      // Use fixed position for both mobile and desktop with high z-index
+      'fixed top-0 left-0 right-0 z-50',
       transparent && 'bg-transparent dark:bg-transparent border-transparent',
       className
     )}>
