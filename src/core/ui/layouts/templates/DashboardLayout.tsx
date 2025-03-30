@@ -65,25 +65,22 @@ function DashboardLayout({
             ? "ml-0 md:ml-[280px]" 
             : "ml-0 md:ml-[70px]"),
         )}>
-          {/* Main container */}
-          <div className="w-full overflow-hidden">
-            {/* Header */}
-            <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+          {/* Full-width header */}
+          <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
             
-            {/* Main Content */}
-            <div className="flex-1 w-full overflow-hidden">
-              <PageContainer 
-                className={contentClassName} 
-                maxWidth={maxWidth}
-                padding={padding}
-              >
-                {children}
-              </PageContainer>
-            </div>
-            
-            {/* Footer */}
-            {showFooter && <Footer />}
+          {/* Main Content */}
+          <div className="flex-1 w-full overflow-hidden">
+            <PageContainer 
+              className={contentClassName} 
+              maxWidth={maxWidth}
+              padding={padding}
+            >
+              {children}
+            </PageContainer>
           </div>
+            
+          {/* Footer */}
+          {showFooter && <Footer />}
         </div>
         
         {/* Overlay for mobile sidebar */}

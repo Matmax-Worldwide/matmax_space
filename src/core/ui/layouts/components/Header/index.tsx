@@ -331,14 +331,14 @@ function Header({
       transparent && "bg-transparent border-none",
       className
     )}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 w-full h-full flex items-center justify-between">
         {/* Left Section */}
-        <div className="flex items-center">
+        <div className="flex items-center h-full">
           {/* Mobile menu toggle - only shown on mobile/tablet */}
           {showMobileMenu && layoutType === 'dashboard' && isMobileView && (
             <button 
               onClick={toggleSidebar}
-              className="mr-2 p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              className="mr-2 p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 flex items-center justify-center"
               aria-label="Toggle sidebar menu"
             >
               <Menu size={20} />
@@ -354,14 +354,14 @@ function Header({
         </div>
         
         {/* Right Section */}
-        <div className="flex items-center space-x-1 sm:space-x-2">
+        <div className="flex items-center h-full space-x-2 sm:space-x-3">
           {/* Module Dropdown - Only on mobile */}
           {isMobileView && layoutType === 'dashboard' && (
-            <div className="relative">
+            <div className="relative h-full flex items-center">
               <button
                 onClick={toggleMobileNav}
                 className={cn(
-                  "flex items-center justify-center px-2 py-1.5 rounded-md text-white font-medium shadow-sm",
+                  "flex items-center justify-center px-3 py-1.5 rounded-md text-white font-medium shadow-sm h-8",
                   "transition-all duration-200",
                   activeModule?.color?.replace('bg-', '') || 'bg-gradient-to-r from-blue-500 to-blue-600'
                 )}
@@ -406,20 +406,24 @@ function Header({
             <>
               {/* Blockchain wallet connection */}
               {showWalletConnect && layoutType !== 'auth' && (
-                <BlockchainWallet />
+                <div className="h-full flex items-center">
+                  <BlockchainWallet />
+                </div>
               )}
               
               {/* Language selector */}
-              <LanguageSelector />
+              <div className="h-full flex items-center">
+                <LanguageSelector />
+              </div>
             </>
           )}
           
           {/* Actions Menu Button - Shown only on small screens */}
           {isExtraSmall && layoutType !== 'auth' && (
-            <div className="relative">
+            <div className="relative h-full flex items-center">
               <button
                 onClick={toggleActionsMenu}
-                className="p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                className="flex items-center justify-center p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 h-8 w-8"
                 aria-label="More actions"
                 aria-expanded={actionsMenuOpen}
               >
@@ -462,7 +466,9 @@ function Header({
           )}
           
           {/* User menu - Always visible */}
-          <UserMenu />
+          <div className="h-full flex items-center">
+            <UserMenu />
+          </div>
         </div>
       </div>
     </header>

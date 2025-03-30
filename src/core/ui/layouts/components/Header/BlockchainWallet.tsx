@@ -54,22 +54,22 @@ export function BlockchainWallet() {
         // Connected wallet state
         <button
           onClick={() => setOpen(!open)}
-          className="flex items-center px-1 py-0.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-xs h-6"
+          className="flex items-center px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-xs h-8"
           title="Connected Wallet"
           aria-label="Connected wallet account"
         >
-          <Wallet className="w-3 h-3" />
+          <Wallet className="w-4 h-4 mr-1.5" />
           <span className="ml-1 hidden sm:inline">{formatAddress(walletAddress)}</span>
         </button>
       ) : (
         // Disconnected wallet state
         <button
           onClick={connectWallet}
-          className="flex items-center px-1 py-0.5 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-xs h-6"
+          className="flex items-center px-3 py-1.5 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-xs h-8"
           title="Connect Wallet"
           aria-label="Connect blockchain wallet"
         >
-          <Wallet className="w-3 h-3" />
+          <Wallet className="w-4 h-4 mr-1.5" />
           <span className="ml-1 hidden xs:inline">Connect</span>
           <span className="hidden sm:inline"> Wallet</span>
         </button>

@@ -47,11 +47,11 @@ export default function UserMenu() {
     <div className="relative" ref={menuRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="h-6 w-6 flex items-center justify-center rounded-full bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700"
+        className="h-8 w-8 flex items-center justify-center rounded-full bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700"
         aria-label="User menu"
         title="Account menu"
       >
-        <div className="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[10px]">
+        <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs">
           {userEmail ? userEmail.charAt(0).toUpperCase() : 'U'}
         </div>
       </button>
