@@ -51,7 +51,6 @@ export function MobileMenu({
       color: 'from-blue-500 to-blue-700',
       bgColor: 'bg-blue-500',
       textColor: 'text-blue-500',
-      description: 'Your dashboard overview and analytics.',
     },
     {
       id: 'lms',
@@ -60,7 +59,6 @@ export function MobileMenu({
       color: 'from-green-500 to-green-700',
       bgColor: 'bg-green-500',
       textColor: 'text-green-500',
-      description: 'Courses, lessons and educational content.',
     },
     {
       id: 'admin',
@@ -69,7 +67,6 @@ export function MobileMenu({
       color: 'from-purple-500 to-purple-700',
       bgColor: 'bg-purple-500',
       textColor: 'text-purple-500',
-      description: 'User management and system settings.',
     },
     {
       id: 'payments',
@@ -78,7 +75,6 @@ export function MobileMenu({
       color: 'from-amber-500 to-amber-700',
       bgColor: 'bg-amber-500',
       textColor: 'text-amber-500',
-      description: 'Transactions, billing and payment history.',
     },
     {
       id: 'finance',
@@ -87,7 +83,6 @@ export function MobileMenu({
       color: 'from-red-500 to-red-700',
       bgColor: 'bg-red-500',
       textColor: 'text-red-500',
-      description: 'Financial reporting and analytics.',
     },
     {
       id: 'store',
@@ -96,7 +91,6 @@ export function MobileMenu({
       color: 'from-sky-500 to-sky-700',
       bgColor: 'bg-sky-500',
       textColor: 'text-sky-500',
-      description: 'Products, purchases, and marketplace.',
     },
   ];
   
