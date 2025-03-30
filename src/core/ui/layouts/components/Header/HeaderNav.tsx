@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/src/core/utils/styling';
 import { 
@@ -13,71 +12,27 @@ import {
   BookOpen,
   BarChart,
   Headphones,
-  Settings,
   ChevronDown,
-  Menu
+  Menu,
+  Store,
+  Globe,
+  Check,
+  ArrowRight,
+  User,
+  Settings,
+  LogOut
 } from 'lucide-react';
 import { useLayout } from '../../providers/LayoutProvider';
+import BlockchainWallet from './BlockchainWallet';
 
-// Navigation item type definition
-type NavItemType = {
-  title: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  children?: {
-    title: string;
-    href: string;
-  }[];
-  permissions?: string[]; // For permission-based visibility
-  isHighlighted?: boolean; // To highlight the current module
-  color?: string; // Color theme for the module
-};
-
-/**
- * HeaderNav - Modular navigation component for the MatMax Wellness Studio header
- * 
- * This component provides the primary navigation between major application modules.
- * It's designed as part of the centralized layout system described in layoutguidelines.mdc.
- * 
- * Features:
- * - Color-coded module navigation
- * - Dropdown menus for sub-sections
- * - Integration with the sidebar via useLayout
- * - Permission-based visibility control
- * - Accessibility support with ARIA attributes
- * - Responsive design with mobile-specific layout
- * 
- * Usage:
- * <HeaderNav /> - typically used within the Header component
- * 
- * Adding a new module:
- * 1. Add a new entry to the navItems array
- * 2. Specify title, href, icon, color, and children
- * 3. Add required permissions to the userPermissions array
- * 
- * @see layouts/README.md for full documentation
- */
-export function HeaderNav() {
-  const pathname = usePathname();
-  const router = useRouter();
-  const { setSidebarOpen, isMobile, isSmallMobile, isTablet, setActiveSection, activeSection } = useLayout();
-  
-  // Track opened dropdown
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  // Track mobile menu open state
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
-  // In a real app, this would come from an auth context
-  const userPermissions = ['admin.view', 'lms.view', 'finance.view', 'payments.view', 'main.view'];
-  
-  // Navigation items - complementary menu for future development sections
-  const navItems: NavItemType[] = [
+// Simple navigation configuration
+export const NAV_ITEMS = [
     {
       title: 'MAIN',
       href: '/dashboard',
+    section: 'main',
       icon: Home,
-      permissions: ['main.view'],
-      color: 'from-blue-500 to-blue-600',
+      color: 'from-blue-400 to-blue-500',
       children: [
         { title: 'Dashboard', href: '/dashboard' },
         { title: 'International', href: '/international' },
@@ -88,272 +43,302 @@ export function HeaderNav() {
     {
       title: 'LMS',
       href: '/lms',
+    section: 'lms',
       icon: GraduationCap,
-      permissions: ['lms.view'],
-      color: 'from-green-500 to-green-600',
+      color: 'from-green-400 to-green-500',
       children: [
         { title: 'Courses', href: '/lms/courses' },
-        { title: 'Students', href: '/lms/students' },
-        { title: 'Instructors', href: '/lms/instructors' },
-        { title: 'Certifications', href: '/lms/certifications' }
+      { title: 'Students', href: '/lms/students' }
       ]
     },
     {
       title: 'Admin',
       href: '/admin',
+    section: 'admin',
       icon: ShieldCheck,
-      permissions: ['admin.view'],
-      color: 'from-purple-500 to-purple-600',
+      color: 'from-purple-400 to-purple-500',
       children: [
         { title: 'Users', href: '/admin/users' },
-        { title: 'Roles', href: '/admin/roles' },
-        { title: 'Permissions', href: '/admin/permissions' },
-        { title: 'Audit Logs', href: '/admin/audit-logs' }
+      { title: 'Roles', href: '/admin/roles' }
       ]
     },
     {
       title: 'Payments',
       href: '/payments',
+    section: 'payments',
       icon: CreditCard,
-      permissions: ['payments.view'],
-      color: 'from-amber-500 to-amber-600',
+      color: 'from-amber-400 to-amber-500',
       children: [
         { title: 'Transactions', href: '/payments/transactions' },
-        { title: 'Subscriptions', href: '/payments/subscriptions' },
-        { title: 'Invoices', href: '/payments/invoices' },
-        { title: 'Methods', href: '/payments/methods' }
+      { title: 'Invoices', href: '/payments/invoices' }
       ]
     },
     {
       title: 'Finance',
       href: '/finance',
+    section: 'finance',
       icon: Landmark,
-      permissions: ['finance.view'],
-      color: 'from-sky-500 to-sky-600',
-      children: [
-        { title: 'Reports', href: '/finance/reports' },
-        { title: 'Accounting', href: '/finance/accounting' },
-        { title: 'Budgets', href: '/finance/budgets' },
-        { title: 'Taxes', href: '/finance/taxes' }
-      ]
-    },
-    {
-      title: 'Resources',
-      href: '/resources',
-      icon: BookOpen,
-      permissions: ['resources.view'],
-      color: 'from-indigo-500 to-indigo-600'
-    },
-    {
-      title: 'Analytics',
-      href: '/analytics',
-      icon: BarChart,
-      permissions: ['analytics.view'],
-      color: 'from-teal-500 to-teal-600'
-    },
-    {
-      title: 'Support',
-      href: '/support',
-      icon: Headphones,
-      permissions: ['support.view'],
-      color: 'from-red-500 to-red-600'
+    color: 'from-sky-400 to-sky-500'
+  },
+  {
+    title: 'Store',
+    href: '/store',
+    section: 'store',
+    icon: Store,
+    color: 'from-pink-400 to-pink-500'
+  }
+];
+
+// Available languages
+const LANGUAGES = [
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+  { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
+];
+
+export function HeaderNav() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { setActiveSection, setSidebarOpen, isMobile, isTablet, activeSection, currentModule } = useLayout();
+  
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState('en');
+  
+  // Check if a navigation item is active based on current section and pathname
+  const isActive = (href: string, section: string) => {
+    // Normalize section to lowercase for consistent comparison
+    const normalizedSection = section.toLowerCase();
+    const normalizedActiveSection = activeSection?.toLowerCase();
+    
+    // For debugging
+    console.log(`Checking if active: ${normalizedSection}, activeSection: ${normalizedActiveSection}, pathname: ${pathname}`);
+    
+    // First, check URL parameters for section
+    if (pathname.startsWith('/protected')) {
+      // Get section from URL query parameter
+      const sectionParam = pathname.includes('?') ? 
+        new URLSearchParams(pathname.split('?')[1]).get('section')?.toLowerCase() : null;
+      
+      // Direct match with URL parameter section
+      if (sectionParam === normalizedSection) {
+        console.log(`✅ Section ${normalizedSection} is active via URL parameter`);
+        return true;
+      }
     }
-  ];
+    
+    // Next, check if it matches the active section from context
+    if (normalizedActiveSection === normalizedSection) {
+      console.log(`✅ Section ${normalizedSection} is active via context state`);
+      return true;
+    }
+    
+    // Finally, check path-based matching as fallback
+    const isPathActive = href === '/dashboard' 
+      ? pathname === '/dashboard' 
+      : pathname.startsWith(href);
+    
+    if (isPathActive) {
+      console.log(`✅ Section ${normalizedSection} is active via path matching`);
+    }
+    
+    return isPathActive;
+  };
+  
+  // Handle navigation with simplified approach
+  const navigate = (href: string, section: string) => {
+    // Log for debugging
+    console.log(`Navigating to section: ${section}, href: ${href}`);
+    
+    // Close any open UI elements
+    setOpenDropdown(null);
+    setMobileMenuOpen(false);
+    
+    // Ensure section is lowercase for consistency
+    const normalizedSection = section.toLowerCase();
+    
+    // Update sidebar context
+    setActiveSection(normalizedSection);
+    
+    // Open sidebar on desktop when navigating
+    if (!isMobile) {
+      setSidebarOpen(true);
+    }
+    
+    // Only perform navigation in browser environment
+    if (typeof window === 'undefined') return;
+    
+    // Store the active section in localStorage for persistence
+    localStorage.setItem('activeSection', normalizedSection);
+    
+    // For ALL sections, use the protected page with section parameter
+    window.location.href = `/protected?section=${normalizedSection}`;
+  };
   
   // Toggle dropdown menu
   const toggleDropdown = (title: string) => {
     setOpenDropdown(prev => prev === title ? null : title);
   };
   
-  // Handle navigation with sidebar opening
-  const handleNavigation = (href: string, hasChildren: boolean, module?: string) => {
-    // Open the sidebar when navigating to a new section (but not on mobile)
-    if (!isMobile) {
-      setSidebarOpen(true);
-    }
-    
-    // Close any open dropdowns
-    setOpenDropdown(null);
-    
-    // Set active section for contextual side menu
-    if (module) {
-      setActiveSection(module);
-    }
-    
-    // On mobile with children, keep the menu open to show contextual items
-    if (isMobile && hasChildren) {
-      // Navigate to the main module page even on mobile
-      router.push(href);
-      return;
-    }
-    
-    // Close mobile menu only when actually navigating
-    if (!hasChildren) {
-      setMobileMenuOpen(false);
-      router.push(href);
-    } else {
-      // Navigate to the main module page even when it has children
-      router.push(href);
-    }
-  };
-  
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = () => {
-      setOpenDropdown(null);
-    };
-    
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, []);
-  
-  // Close mobile menu on resize to desktop
-  useEffect(() => {
-    if (!isMobile && mobileMenuOpen) {
-      setMobileMenuOpen(false);
-    }
-  }, [isMobile, mobileMenuOpen]);
-  
-  // Check if user has permission for an item
-  const hasPermission = (item: NavItemType) => {
-    if (!item.permissions || item.permissions.length === 0) return true;
-    return item.permissions.some(permission => userPermissions.includes(permission));
-  };
-  
-  // Determine if we should use mobile layout
-  const useMobileLayout = isMobile || isTablet;
-  
-  // Render mobile menu button
-  const renderMobileMenuButton = () => (
-    <button
-      onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-      className="flex items-center justify-center p-2 rounded-md bg-white dark:bg-neutral-800 border border-border shadow-sm"
-      aria-expanded={mobileMenuOpen}
-      aria-controls="mobile-nav"
-      aria-label="Toggle navigation menu"
-    >
-      <Menu size={20} />
-      <span className="ml-2 text-sm font-medium">Menu</span>
-    </button>
-  );
-  
-  // Render mobile navigation panel
-  const renderMobileNavPanel = () => (
-    <div
-      id="mobile-nav"
-      className={cn(
-        "absolute left-0 right-0 top-full mt-1 bg-white dark:bg-neutral-800 border border-border rounded-md shadow-lg z-50 transition-all duration-200 overflow-hidden",
-        isSmallMobile ? "mx-2" : "mx-4",
-        mobileMenuOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
-      )}
-    >
-      <div className="p-2 max-h-[80vh] overflow-y-auto">
-        {/* Main Section Headers */}
-        <div className="mb-4">
-          <h3 className="px-3 py-1 text-xs uppercase text-muted-foreground font-medium">Main Sections</h3>
-          <div className="grid grid-cols-2 gap-1 mt-1">
-            {navItems.filter(hasPermission).map((item) => {
-              // Use toLowerCase() for consistent case comparison
-              const isActiveSection = activeSection.toLowerCase() === item.title.toLowerCase();
-              // Determine if this item should be highlighted based on active section
-              const shouldHighlight = isActiveSection;
-              
-              return (
-                <button
-                  key={item.href}
-                  className={cn(
-                    "flex items-center px-3 py-2 rounded-md text-sm font-medium",
-                    {
-                      "bg-gradient-to-r text-white": shouldHighlight,
-                      [item.color || ""]: shouldHighlight,
-                      "bg-white dark:bg-neutral-800 text-foreground border border-border": !shouldHighlight
-                    }
-                  )}
-                  onClick={() => {
-                    handleNavigation(item.href, true, item.title.toLowerCase());
-                  }}
-                >
-                  <item.icon className="h-4 w-4 mr-2 flex-shrink-0" />
-                  <span>{item.title}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        
-        {/* Active Section Contextual Items */}
-        <div className="mt-4 border-t border-border pt-3">
-          <h3 className="px-3 py-1 text-xs uppercase text-muted-foreground font-medium">
-            {activeSection.charAt(0).toUpperCase() + activeSection.slice(1).toLowerCase()} Menu
-          </h3>
-          
-          <div className="mt-2 space-y-1">
-            {navItems.filter(hasPermission).find(item => 
-              item.title.toLowerCase() === activeSection.toLowerCase())?.children?.map((child) => {
-              const childPath = `${child.href}`;
-              const isChildActive = pathname === childPath;
-              
-              return (
-                <Link
-                  key={childPath}
-                  href={childPath}
-                  onClick={() => {
-                    handleNavigation(childPath, false, activeSection);
-                  }}
-                  className={cn(
-                    "block px-3 py-2 text-sm rounded-md hover:bg-muted flex items-center",
-                    isChildActive
-                      ? "text-primary bg-primary/5 font-medium"
-                      : "text-foreground"
-                  )}
-                >
-                  <span className={cn(
-                    "w-2 h-2 rounded-full mr-2",
-                    isChildActive ? "bg-primary" : "bg-muted-foreground"
-                  )}></span>
-                  {child.title}
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-  
-  // Render desktop navigation
-  const renderDesktopNav = () => (
-    <nav className="mx-4 max-w-full overflow-hidden">
-      <ul className="flex gap-6 overflow-hidden">
-        {navItems.filter(hasPermission).map((item) => (
-          <li key={item.href} className="relative whitespace-nowrap">
-            <Link 
-              href={item.href} 
-              className={cn(
-                "flex items-center h-16 border-b-2 text-sm transition-colors duration-150 hover:text-primary",
-                pathname.startsWith(item.href) ? "border-primary text-primary" : "border-transparent text-muted-foreground"
-              )}
-            >
-              <item.icon className="w-4 h-4 mr-2" />
-              <span>{item.title}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  );
-  
   return (
-    <nav className="relative">
-      {useMobileLayout ? (
-        <>
-          {renderMobileMenuButton()}
-          {renderMobileNavPanel()}
-        </>
-      ) : (
-        renderDesktopNav()
+    <nav className="flex items-center justify-center h-full">
+      {/* Mobile menu toggle - should be visible in HeaderNav only for desktop */}
+      {!isMobile && !isTablet && (
+        <div className="flex items-center h-full space-x-2">
+          {NAV_ITEMS.map((item) => {
+            const active = isActive(item.href, item.section);
+            const hasChildren = item.children && item.children.length > 0;
+            
+            return (
+              <div key={item.title} className="relative">
+                {hasChildren ? (
+                  <>
+                <button
+                      onClick={() => navigate(`/protected?section=${item.section.toLowerCase()}`, item.section)}
+                  className={cn(
+                        "flex items-center px-4 py-2 text-sm rounded-lg font-medium",
+                        active 
+                          ? `bg-gradient-to-r ${item.color} text-white` 
+                          : "text-foreground hover:bg-muted"
+                      )}
+                >
+                  <item.icon className="w-4 h-4 mr-2" />
+                      <span>{item.title}</span>
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => navigate(item.href, item.section)}
+                    className={cn(
+                      "flex items-center px-4 py-2 text-sm rounded-lg font-medium",
+                      active 
+                        ? `bg-gradient-to-r ${item.color} text-white` 
+                        : "text-foreground hover:bg-muted"
+                    )}
+                  >
+                    <item.icon className="w-4 h-4 mr-2" />
+                    <span>{item.title}</span>
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+      
+      {/* Mobile menu dropdown */}
+      {mobileMenuOpen && (isMobile || isTablet) && (
+        <div className="absolute top-16 left-0 w-full bg-white dark:bg-neutral-900 shadow-lg z-50 border-b border-neutral-200 dark:border-neutral-700">
+          <div className="p-1.5">
+            {/* Wallet connect */}
+            <div className="mb-2 px-2 py-1 border-b border-neutral-200 dark:border-neutral-700">
+              <BlockchainWallet 
+                variant={currentModule as 'default' | 'admin' | 'lms' | 'finance' | 'payments'} 
+              />
+            </div>
+            
+            {/* Navigation Items */}
+            <div className="mb-2 pb-2 border-b border-neutral-200 dark:border-neutral-700">
+              <div className="text-xs text-muted-foreground mb-1 px-2">Navigation</div>
+              {NAV_ITEMS.map((item) => (
+                  <button
+                    key={item.href}
+                  onClick={() => {
+                    console.log(`Mobile menu: navigating to section ${item.section}`);
+                    // Close the mobile menu
+                    setMobileMenuOpen(false);
+                    
+                    // Get normalized section name
+                    const normalizedSection = item.section.toLowerCase();
+                    
+                    // Update active section state immediately for UI updates
+                    setActiveSection(normalizedSection);
+                    
+                    // Store in localStorage
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('activeSection', normalizedSection);
+                    }
+                    
+                    // Navigate to the protected page with section parameter
+                    window.location.href = `/protected?section=${normalizedSection}`;
+                  }}
+                    className={cn(
+                    "flex items-center w-full px-3 py-1.5 text-xs rounded-md mb-0.5",
+                    isActive(item.href, item.section) 
+                      ? `bg-gradient-to-r ${item.color} text-white` 
+                      : "text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                  )}
+                >
+                  <item.icon className="w-3 h-3 mr-1.5" />
+                    <span>{item.title}</span>
+                  {isActive(item.href, item.section) && (
+                    <ArrowRight className="ml-auto w-3 h-3" />
+                  )}
+                  </button>
+              ))}
+            </div>
+            
+            {/* Language Selector */}
+            <div className="mb-2 pb-2 border-b border-neutral-200 dark:border-neutral-700">
+              <div className="text-xs text-muted-foreground mb-1 px-2">Language</div>
+              {LANGUAGES.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => {
+                    setSelectedLanguage(lang.code);
+                    console.log(`Changed language to ${lang.code}`);
+                  }}
+                  className="flex w-full items-center px-3 py-1.5 text-xs hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md mb-0.5"
+                >
+                  <span className="mr-2">{lang.flag}</span>
+                  {lang.name}
+                  {lang.code === selectedLanguage && (
+                    <Check className="ml-auto h-3 w-3 text-primary" />
+                  )}
+                </button>
+                  ))}
+                </div>
+            
+            {/* User Profile Section */}
+            <div>
+              <div className="text-xs text-muted-foreground mb-1 px-2">Account</div>
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  router.push('/profile');
+                }}
+                className="flex w-full items-center px-3 py-1.5 text-xs hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md mb-0.5"
+              >
+                <User className="w-3 h-3 mr-1.5" />
+                <span>Your Profile</span>
+              </button>
+              
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  router.push('/settings');
+                }}
+                className="flex w-full items-center px-3 py-1.5 text-xs hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md mb-0.5"
+              >
+                <Settings className="w-3 h-3 mr-1.5" />
+                <span>Settings</span>
+              </button>
+              
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  router.push('/sign-in');
+                }}
+                className="flex w-full items-center px-3 py-1.5 text-xs hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md mb-0.5"
+              >
+                <LogOut className="w-3 h-3 mr-1.5" />
+                <span>Sign Out</span>
+              </button>
+              </div>
+          </div>
+        </div>
       )}
     </nav>
   );

@@ -3,8 +3,7 @@
 import { ReactNode, useEffect, useRef, useState } from 'react';
 import { useLayout } from '../../providers/LayoutProvider';
 import { cn } from '@/src/core/utils/styling';
-import { X } from 'lucide-react';
-import Logo from '../Header/Logo';
+import { X, ChevronLeft, Code } from 'lucide-react';
 import SidebarNav from './SidebarNav';
 import SidebarFooter from './SidebarFooter';
 
@@ -12,102 +11,80 @@ type SidebarProps = {
   className?: string;
   children?: ReactNode;
   showLogo?: boolean;
+  isOpen?: boolean;
+  toggleSidebar?: () => void;
 };
 
 /**
  * Application sidebar component
  * Provides navigation and context-specific actions
- * Enhanced for better mobile experience with improved performance
  */
-export function Sidebar({ className, children, showLogo = true }: SidebarProps) {
-  const { sidebarOpen, setSidebarOpen, isMobile, isSmallMobile, isLandscape, viewportHeight } = useLayout();
+export function Sidebar({ className, children, showLogo = false, isOpen, toggleSidebar }: SidebarProps) {
+  const { 
+    sidebarOpen: contextSidebarOpen, 
+    setSidebarOpen, 
+    isMobile, 
+    isTablet, 
+    sidebarExpanded, 
+    setSidebarExpanded,
+    theme,
+    setTheme
+  } = useLayout();
+  
+  // Use props if provided, otherwise fall back to context
+  const sidebarOpen = isOpen !== undefined ? isOpen : contextSidebarOpen;
+  const handleToggleSidebar = toggleSidebar || (() => setSidebarOpen(!sidebarOpen));
+  
   const sidebarRef = useRef<HTMLElement>(null);
   const [touchStartX, setTouchStartX] = useState(0);
-  const [touchDiffX, setTouchDiffX] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
+  const isMobileDevice = isMobile || isTablet;
   
-  // Accessibility improvement: trap focus in sidebar when open on mobile
-  useEffect(() => {
-    if (!isMobile || !sidebarOpen || !sidebarRef.current) return;
-    
-    // Focus the first focusable element in the sidebar
-    const focusableElements = sidebarRef.current.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-    if (focusableElements.length > 0) {
-      (focusableElements[0] as HTMLElement).focus();
-    }
-  }, [sidebarOpen, isMobile]);
+  // Toggle collapsed state (icons only) when clicking the toggle button
+  const toggleCollapsed = () => {
+    setSidebarExpanded(!sidebarExpanded);
+  };
   
-  // Close sidebar when pressing Escape key
-  useEffect(() => {
-    const handleEscKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && sidebarOpen && isMobile) {
-        setSidebarOpen(false);
-      }
-    };
-    
-    window.addEventListener('keydown', handleEscKey);
-    return () => window.removeEventListener('keydown', handleEscKey);
-  }, [sidebarOpen, setSidebarOpen, isMobile]);
+  // Toggle between light and dark theme
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
   
-  // Handle touch interactions with improved accuracy and performance
+  // Handle touch interactions for mobile swipe
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStartX(e.touches[0].clientX);
-    setIsDragging(true);
-    setTouchDiffX(0);
   };
   
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return;
+    if (!sidebarOpen) return;
     
     const currentX = e.touches[0].clientX;
     const diff = touchStartX - currentX;
     
     // Only allow dragging left to close
-    if (diff < 0) return;
-    
-    // Limit the drag distance
-    const maxDrag = 100;
-    const boundedDiff = Math.min(diff, maxDrag);
-    
-    setTouchDiffX(boundedDiff);
-    
-    // Apply real-time transform during drag for smoother feeling
-    if (sidebarRef.current) {
-      // Use hardware acceleration for smoother performance
-      sidebarRef.current.style.transform = `translateX(-${boundedDiff}px)`;
-      sidebarRef.current.style.transition = 'none';
+    if (diff > 50) {
+      handleToggleSidebar();
     }
   };
   
-  const handleTouchEnd = () => {
-    setIsDragging(false);
+  // Close sidebar when pressing Escape key
+  useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && sidebarOpen && isMobileDevice) {
+        handleToggleSidebar();
+      }
+    };
     
-    // Reset styles
-    if (sidebarRef.current) {
-      sidebarRef.current.style.transform = '';
-      sidebarRef.current.style.transition = '';
-    }
-    
-    // If dragged more than 50px, close the sidebar
-    if (touchDiffX > 50) {
-      setSidebarOpen(false);
-    }
-  };
-  
-  // Determine optimal sidebar height for landscape mode on mobile
-  const sidebarStyle = isLandscape && isMobile
-    ? { maxHeight: `${viewportHeight}px`, overflowY: 'auto' as const }
-    : {};
+    window.addEventListener('keydown', handleEscKey);
+    return () => window.removeEventListener('keydown', handleEscKey);
+  }, [sidebarOpen, handleToggleSidebar, isMobileDevice]);
   
   return (
     <>
       {/* Mobile overlay for closing the sidebar */}
-      {isMobile && sidebarOpen && (
+      {isMobileDevice && sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-300 will-change-opacity"
-          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity"
+          onClick={handleToggleSidebar}
           aria-hidden="true"
         />
       )}
@@ -115,57 +92,84 @@ export function Sidebar({ className, children, showLogo = true }: SidebarProps) 
       {/* Sidebar container */}
       <aside
         ref={sidebarRef}
-        data-sidebar
-        style={sidebarStyle}
         className={cn(
-          "fixed top-0 bottom-0 left-0 z-50 w-64 bg-card border-r border-border transition-all duration-300 ease-in-out flex flex-col",
-          "will-change-transform backface-visibility-hidden",
-          isMobile 
+          "fixed top-[64px] bottom-0 left-0 z-40 bg-card border-r border-border h-[calc(100vh-64px)]",
+          "transition-all duration-300 ease-in-out",
+          isMobileDevice 
             ? sidebarOpen 
-              ? "translate-x-0 shadow-xl" 
-              : "-translate-x-full" 
-            : "translate-x-0",
-          // Adjust width for very small screens
-          isSmallMobile && "w-[85vw]",
+              ? "translate-x-0 shadow-xl w-[280px]" 
+              : "-translate-x-full w-[280px]" 
+            : sidebarOpen
+              ? "translate-x-0"
+              : "translate-x-0",
+          !isMobileDevice ? sidebarExpanded ? "w-[240px]" : "w-[60px]" : "",
           className
         )}
-        onTouchStart={isMobile && sidebarOpen ? handleTouchStart : undefined}
-        onTouchMove={isMobile && sidebarOpen ? handleTouchMove : undefined}
-        onTouchEnd={isMobile && sidebarOpen ? handleTouchEnd : undefined}
-        onTouchCancel={isMobile && sidebarOpen ? handleTouchEnd : undefined}
-        role="dialog"
-        aria-modal={isMobile ? "true" : "false"}
-        aria-label="Navigation menu"
+        onTouchStart={isMobileDevice ? handleTouchStart : undefined}
+        onTouchMove={isMobileDevice ? handleTouchMove : undefined}
+        role="navigation"
+        aria-label="Main navigation"
       >
-        {/* Sidebar header with logo aligned left */}
-        <div className="flex items-center justify-between px-4 py-4 sm:py-6 border-b border-border">
-          {showLogo ? (
-            <div className="flex justify-start">
-              <Logo darkModeInvert={true} />
-            </div>
-          ) : (
-            <h2 className="text-lg font-semibold">Menu</h2>
+        {/* Sidebar header with title */}
+        <div className="flex items-center h-16 px-4 border-b border-border">
+          <div className="flex-1 flex items-center overflow-hidden">
+            {sidebarExpanded ? (
+              <h2 className="text-lg font-semibold truncate">Menu</h2>
+            ) : (
+              <div className="flex justify-center">
+                <div className="text-muted-foreground">
+                  <Code size={20} />
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* Toggle button for desktop */}
+          {!isMobileDevice && (
+            <button
+              onClick={toggleCollapsed}
+              className={cn(
+                "p-1 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 text-muted-foreground",
+                !sidebarExpanded && "absolute right-2"
+              )}
+              aria-label={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
+            >
+              <ChevronLeft
+                size={18}
+                className={cn("transform transition-transform duration-300", 
+                  !sidebarExpanded && "rotate-180"
+                )}
+              />
+            </button>
           )}
           
-          {isMobile && (
+          {/* Toggle button for mobile */}
+          {isMobileDevice && sidebarOpen && (
             <button
-              onClick={() => setSidebarOpen(false)}
-              className="p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary/30 touch-manipulation"
+              onClick={handleToggleSidebar}
+              className="ml-2 p-1 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
               aria-label="Close sidebar"
-              style={{ touchAction: 'manipulation' }}
             >
-              <X size={20} />
+              <X size={18} />
             </button>
           )}
         </div>
         
         {/* Sidebar content */}
-        <div className="flex-1 overflow-y-auto py-4 overscroll-contain">
-          {children || <SidebarNav />}
+        <div className="flex flex-col h-[calc(100%-4rem)] overflow-y-auto">
+          <div className="flex-1 py-2">
+            {children || <SidebarNav collapsed={!sidebarExpanded} />}
+          </div>
+          
+          {/* Sidebar footer - Pass theme props */}
+          <div className="border-t border-border">
+            <SidebarFooter 
+              collapsed={!sidebarExpanded} 
+              theme={theme}
+              setTheme={setTheme}
+            />
+          </div>
         </div>
-        
-        {/* Sidebar footer */}
-        <SidebarFooter />
       </aside>
     </>
   );

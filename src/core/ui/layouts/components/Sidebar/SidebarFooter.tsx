@@ -1,69 +1,80 @@
-import { useLayout } from '../../providers/LayoutProvider';
-import { Info, Sun, Moon, Monitor } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 import { cn } from '@/src/core/utils/styling';
 
+type SidebarFooterProps = {
+  className?: string;
+  collapsed?: boolean;
+  theme?: 'light' | 'dark' | 'system';
+  setTheme?: (theme: 'light' | 'dark' | 'system') => void;
+};
+
 /**
- * Sidebar footer component
- * Contains application metadata and theme controls
+ * Footer component for the application sidebar
  */
-export function SidebarFooter() {
-  const { theme, setTheme } = useLayout();
+export function SidebarFooter({ className, collapsed = false, theme = 'light', setTheme }: SidebarFooterProps) {
+  // Toggle between light and dark theme
+  const toggleTheme = () => {
+    if (setTheme) {
+      const newTheme = theme === 'dark' ? 'light' : 'dark';
+      setTheme(newTheme);
+    }
+  };
   
-  // Application version information - in a real app, this would be pulled from environment or API
-  const appVersion = 'v1.0.0';
-  const environmentName = process.env.NODE_ENV === 'production' ? 'Production' : 'Development';
+  // Make sure we have a valid theme value
+  const currentTheme = theme || 'light';
+  const isDark = currentTheme === 'dark';
   
   return (
-    <div className="border-t border-border p-4 space-y-3">
-      {/* Theme selection controls */}
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-muted-foreground">Theme</span>
-        <div className="flex space-x-1 bg-background rounded-md overflow-hidden border border-border">
+    <div className={cn(
+      "py-2", 
+      collapsed ? "flex justify-center items-center" : "px-3",
+      className
+    )}>
+      {/* Theme Switcher - Centered in the footer */}
+      <div className={cn(
+        "flex items-center justify-center w-full",
+        collapsed ? "flex-col" : ""
+      )}>
+        {!collapsed && (
           <button
-            onClick={() => setTheme('light')}
+            onClick={toggleTheme}
             className={cn(
-              "p-1.5",
-              theme === 'light' 
-                ? "bg-primary text-primary-foreground" 
-                : "text-muted-foreground hover:text-foreground"
+              "w-full flex items-center justify-center p-2 rounded-md transition-colors",
+              isDark 
+                ? "bg-gray-700 text-yellow-400 hover:bg-gray-600" 
+                : "bg-blue-50 text-indigo-600 hover:bg-blue-100"
             )}
-            title="Light theme"
+            aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
           >
-            <Sun size={16} />
+            {isDark ? (
+              <>
+                <Sun size={18} />
+                <span className="ml-2 font-medium">Light Mode</span>
+              </>
+            ) : (
+              <>
+                <Moon size={18} />
+                <span className="ml-2 font-medium">Dark Mode</span>
+              </>
+            )}
           </button>
+        )}
+        
+        {collapsed && (
           <button
-            onClick={() => setTheme('dark')}
+            onClick={toggleTheme}
             className={cn(
-              "p-1.5",
-              theme === 'dark' 
-                ? "bg-primary text-primary-foreground" 
-                : "text-muted-foreground hover:text-foreground"
+              "p-2 rounded-md transition-colors",
+              isDark 
+                ? "bg-gray-700 text-yellow-400 hover:bg-gray-600" 
+                : "bg-blue-50 text-indigo-600 hover:bg-blue-100"
             )}
-            title="Dark theme"
+            aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+            title={isDark ? "Light mode" : "Dark mode"}
           >
-            <Moon size={16} />
+            {isDark ? <Sun size={18} /> : <Moon size={18} />}
           </button>
-          <button
-            onClick={() => setTheme('system')}
-            className={cn(
-              "p-1.5",
-              theme === 'system' 
-                ? "bg-primary text-primary-foreground" 
-                : "text-muted-foreground hover:text-foreground"
-            )}
-            title="System theme"
-          >
-            <Monitor size={16} />
-          </button>
-        </div>
-      </div>
-      
-      {/* Application info */}
-      <div className="text-xs text-muted-foreground space-y-1">
-        <div className="flex items-center">
-          <Info size={12} className="mr-1.5" />
-          <span>{appVersion} ({environmentName})</span>
-        </div>
+        )}
       </div>
     </div>
   );

@@ -1,112 +1,114 @@
 "use client";
 
-import { ReactNode, memo } from 'react';
-import { LayoutProvider } from '../providers/LayoutProvider';
-import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
-import Footer from '../components/Footer';
-import PageContainer from '../components/Content/PageContainer';
+import { useState, useEffect } from 'react';
+import { useLayout, LayoutProvider } from '../providers/LayoutProvider';
 import { cn } from '@/src/core/utils/styling';
-import { useLayout } from '../providers/LayoutProvider';
+import { Sidebar } from '../components/Sidebar';
+import { Header } from '../components/Header';
+import Footer from '../components/Footer';
 
-type DashboardLayoutProps = {
-  children: ReactNode;
-  showSidebar?: boolean;
-  showFooter?: boolean;
-  contentClassName?: string;
-  maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
-  padding?: 'none' | 'sm' | 'md' | 'lg';
-};
+// Dashboard Layout props
+interface DashboardLayoutProps {
+  children: React.ReactNode;
+}
 
-/**
- * Dashboard layout template
- * Main layout for authenticated sections of the application
- * Optimized for mobile with responsive layout adaptations and performance enhancements
- */
-function DashboardLayout({ 
-  children,
-  showSidebar = true,
-  showFooter = true,
-  contentClassName,
-  maxWidth = '2xl',
-  padding = 'md'
-}: DashboardLayoutProps) {
-  const DashboardContent = () => {
-    const { 
-      isMobile, 
-      isTablet, 
-      isSidebarOpen, 
-      toggleSidebar, 
-      layoutId, 
-      route 
-    } = useLayout();
+// Internal component that uses the layout context
+function DashboardLayoutContent({ children }: DashboardLayoutProps) {
+  const { isMobile, isTablet, viewportWidth, sidebarExpanded, setSidebarExpanded } = useLayout();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  
+  // Sidebar constants
+  const COLLAPSED_WIDTH = 60;
+  const EXPANDED_WIDTH = 240;
+  
+  // Toggle sidebar and close any open dropdowns
+  const toggleSidebar = () => {
+    // On mobile, toggle visibility
+    if (isMobile || isTablet) {
+      setIsSidebarOpen(prev => !prev);
+    } 
+    // On desktop, toggle between expanded and collapsed
+    else {
+      setSidebarExpanded(!sidebarExpanded);
+    }
     
-    // Get sidebar width values for proper header alignment
-    const sidebarWidth = isMobile ? 0 : (isSidebarOpen ? 280 : 70);
-    
-    return (
-      <div className="flex w-full overflow-x-hidden">
-        {/* Sidebar component (hidden on small devices when collapsed) */}
-        {showSidebar && (
-          <div 
-            className={cn(
-              "fixed inset-y-0 z-50 flex flex-col transition-transform duration-300 ease-in-out bg-sidebar border-r border-border",
-              isSidebarOpen 
-                ? "translate-x-0 shadow-lg"
-                : "-translate-x-full md:translate-x-0 md:w-[70px]",
-              isMobile ? "w-[280px]" : "w-[280px]"
-            )}
-          >
-            <Sidebar />
-          </div>
-        )}
-        
-        {/* Main content area - add max-width to prevent overflow */}
-        <div className={cn(
-          "flex-1 flex flex-col min-h-screen relative transition-all duration-300 ease-in-out",
-          showSidebar && (isSidebarOpen 
-            ? "ml-0 md:ml-[280px]" 
-            : "ml-0 md:ml-[70px]"),
-        )}>
-          {/* Full-width header with sidebar width passed as prop */}
-          <Header 
-            toggleSidebar={toggleSidebar} 
-            isSidebarOpen={isSidebarOpen} 
-            sidebarWidth={sidebarWidth}
-          />
-            
-          {/* Main Content */}
-          <div className="flex-1 w-full overflow-hidden">
-            <PageContainer 
-              className={contentClassName} 
-              maxWidth={maxWidth}
-              padding={padding}
-            >
-              {children}
-            </PageContainer>
-          </div>
-            
-          {/* Footer */}
-          {showFooter && <Footer />}
-        </div>
-        
-        {/* Overlay for mobile sidebar */}
-        {isMobile && isSidebarOpen && showSidebar && (
-          <div 
-            className="fixed inset-0 z-40 bg-black/50" 
-            onClick={() => toggleSidebar()}
-          />
-        )}
-      </div>
-    );
+    // Close any open dropdowns when toggling sidebar
+    try {
+      const event = new CustomEvent('close-all-dropdowns');
+      document.dispatchEvent(event);
+    } catch (e) {
+      console.error('Error dispatching event:', e);
+    }
   };
 
+  // Close sidebar by default on mobile/tablet
+  useEffect(() => {
+    if (isMobile || isTablet) {
+      setIsSidebarOpen(false);
+    } else {
+      setIsSidebarOpen(true);
+    }
+  }, [isMobile, isTablet]);
+
+  // Listen for window resize to ensure layout stays consistent
+  useEffect(() => {
+    const handleResize = () => {
+      // Additional resize handling if needed
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <LayoutProvider>
-      <DashboardContent />
-    </LayoutProvider>
+    <div className="h-screen flex flex-col overflow-hidden bg-background">
+      {/* Header - Fixed position at top */}
+      <Header 
+        toggleSidebar={toggleSidebar}
+        isSidebarOpen={isSidebarOpen}
+      />
+      
+      {/* Main layout container with sidebar and content */}
+      <div className="flex flex-1 overflow-hidden pt-[64px]">
+        {/* Sidebar - Fixed on desktop, overlay on mobile */}
+        <Sidebar 
+          isOpen={isSidebarOpen} 
+          toggleSidebar={toggleSidebar}
+          showLogo={false}
+        />
+        
+        {/* Main content area with proper margin based on sidebar state */}
+        <main 
+          className={cn(
+            "flex-1 overflow-auto transition-all duration-300 ease-in-out",
+            isMobile ? "w-full" : "",
+            !isMobile && isSidebarOpen 
+              ? sidebarExpanded 
+                ? "ml-[240px]" 
+                : "ml-[60px]"
+              : !isMobile ? "ml-[60px]" : ""
+          )}
+        >
+          <div className="max-w-7xl mx-auto p-4 md:p-6 min-h-[calc(100vh-64px)]">
+            {children}
+          </div>
+          
+          {/* Footer */}
+          <Footer />
+        </main>
+      </div>
+    </div>
   );
 }
 
-// Export as default and memo for performance optimization
-export default memo(DashboardLayout); 
+/**
+ * DashboardLayout - Main layout for authenticated pages
+ * Controls the overall structure of the application with sidebar, header and content
+ */
+export function DashboardLayout(props: DashboardLayoutProps) {
+  return (
+    <LayoutProvider initialLayoutType="dashboard">
+      <DashboardLayoutContent {...props} />
+    </LayoutProvider>
+  );
+} 

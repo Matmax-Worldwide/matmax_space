@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/src/core/utils/styling';
 import { 
@@ -20,431 +19,333 @@ import {
   Store,
   BookOpen,
   Headphones,
-  Home
+  Home,
+  LucideIcon
 } from 'lucide-react';
 import { useLayout } from '../../providers/LayoutProvider';
 
-// Navigation item type definition
-type NavItemType = {
+// Define types for navigation items
+type NavItem = {
   title: string;
   href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  children?: {
-    title: string;
-    href: string;
-  }[];
-  permissions?: string[]; // For permission-based visibility
-  section?: 'global' | 'contextual'; // Identifies if this is a global or contextual item
+  icon: LucideIcon;
+  children?: NavChild[];
 };
 
-/**
- * Application sidebar navigation
- * Supports nested navigation items, permission-based visibility, and context-aware navigation
- */
-export function SidebarNav() {
-  const pathname = usePathname();
-  const { activeSection } = useLayout();
-  
-  // Track expanded sections for accordion behavior
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
-  
-  // In a real app, this would come from an auth context
-  const userPermissions = [
-    'dashboard.view', 'international.view', 'users.view', 'blockchain.view',
-    'admin.view', 'lms.view', 'finance.view', 'payments.view', 'store.view',
-    'resources.view', 'analytics.view', 'support.view'
-  ];
-  
-  // Global navigation items that are always visible
-  const globalNavItems: NavItemType[] = [
+type NavChild = {
+  title: string;
+  href: string;
+};
+
+// Define valid section names
+type SectionName = 'main' | 'lms' | 'admin' | 'payments' | 'finance' | 'store';
+
+// Define sidebar navigation configuration for each section
+const SIDEBAR_SECTIONS: Record<SectionName, NavItem[]> = {
+  main: [
     {
       title: 'Dashboard',
       href: '/dashboard',
-      icon: LayoutDashboard,
-      permissions: ['dashboard.view'],
-      section: 'global'
+      icon: Home
     },
     {
-      title: 'Settings',
-      href: '/settings',
-      icon: Settings,
-      permissions: ['settings.view'],
-      section: 'global'
+      title: 'International',
+      href: '/international',
+      icon: Globe,
+      children: [
+        { title: 'Countries', href: '/international/countries' },
+        { title: 'Languages', href: '/international/languages' }
+      ]
+    },
+    {
+      title: 'Users',
+      href: '/users',
+      icon: Users
+    },
+    {
+      title: 'Blockchain',
+      href: '/blockchain',
+      icon: Wallet
     }
-  ];
+  ],
+  lms: [
+    {
+      title: 'Courses',
+      href: '/lms/courses',
+      icon: BookOpen
+    },
+    {
+      title: 'Students',
+      href: '/lms/students',
+      icon: Users
+    },
+    {
+      title: 'Instructors',
+      href: '/lms/instructors',
+      icon: GraduationCap
+    }
+  ],
+  admin: [
+    {
+      title: 'Users',
+      href: '/admin/users',
+      icon: Users
+    },
+    {
+      title: 'Roles',
+      href: '/admin/roles',
+      icon: ShieldCheck
+    },
+    {
+      title: 'Permissions',
+      href: '/admin/permissions',
+      icon: PanelLeft
+    }
+  ],
+  payments: [
+    {
+      title: 'Transactions',
+      href: '/payments/transactions',
+      icon: CreditCard
+    },
+    {
+      title: 'Invoices',
+      href: '/payments/invoices',
+      icon: CreditCard
+    }
+  ],
+  finance: [
+    {
+      title: 'Reports',
+      href: '/finance/reports',
+      icon: BarChart
+    },
+    {
+      title: 'Accounting',
+      href: '/finance/accounting',
+      icon: Landmark
+    }
+  ],
+  store: [
+    {
+      title: 'Products',
+      href: '/store/products',
+      icon: Store
+    },
+    {
+      title: 'Orders',
+      href: '/store/orders',
+      icon: CreditCard
+    }
+  ]
+};
+
+// Global items always shown at the top of sidebar
+const GLOBAL_ITEMS: NavItem[] = [
+  {
+    title: 'Dashboard',
+    href: '/dashboard',
+    icon: LayoutDashboard
+  },
+  {
+    title: 'Settings',
+    href: '/settings',
+    icon: Settings
+  }
+];
+
+// Define section colors for consistent theming
+const SECTION_COLORS: Record<SectionName, string> = {
+  main: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20',
+  lms: 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20',
+  admin: 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20',
+  payments: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20',
+  finance: 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20',
+  store: 'text-pink-600 dark:text-pink-400 bg-pink-50 dark:bg-pink-900/20'
+};
+
+export function SidebarNav({ collapsed = false }: { collapsed?: boolean }) {
+  const pathname = usePathname();
+  const { activeSection } = useLayout();
   
-  // Context-aware navigation items based on active section
-  const contextualNavItems: Record<string, NavItemType[]> = {
-    main: [
-      {
-        title: 'International',
-        href: '/international',
-        icon: Globe,
-        permissions: ['international.view'],
-        section: 'contextual',
-        children: [
-          { title: 'Countries', href: '/international/countries' },
-          { title: 'Currencies', href: '/international/currencies' },
-          { title: 'Languages', href: '/international/languages' },
-          { title: 'Tax Rates', href: '/international/tax-rates' }
-        ]
-      },
-      {
-        title: 'Users',
-        href: '/users',
-        icon: Users,
-        permissions: ['users.view'],
-        section: 'contextual'
-      },
-      {
-        title: 'Blockchain',
-        href: '/blockchain',
-        icon: Wallet,
-        permissions: ['blockchain.view'],
-        section: 'contextual',
-        children: [
-          { title: 'Wallets', href: '/blockchain/wallets' },
-          { title: 'Tokens', href: '/blockchain/tokens' },
-          { title: 'Transactions', href: '/blockchain/transactions' }
-        ]
-      }
-    ],
-    lms: [
-      {
-        title: 'Courses',
-        href: '/lms/courses',
-        icon: BookOpen,
-        permissions: ['lms.view'],
-        section: 'contextual'
-      },
-      {
-        title: 'Students',
-        href: '/lms/students',
-        icon: Users,
-        permissions: ['lms.view'],
-        section: 'contextual'
-      },
-      {
-        title: 'Instructors',
-        href: '/lms/instructors',
-        icon: GraduationCap,
-        permissions: ['lms.view'],
-        section: 'contextual'
-      },
-      {
-        title: 'Certifications',
-        href: '/lms/certifications',
-        icon: PanelLeft,
-        permissions: ['lms.view'],
-        section: 'contextual'
-      }
-    ],
-    finance: [
-      {
-        title: 'Reports',
-        href: '/finance/reports',
-        icon: BarChart,
-        permissions: ['finance.view'],
-        section: 'contextual'
-      },
-      {
-        title: 'Accounting',
-        href: '/finance/accounting',
-        icon: Landmark,
-        permissions: ['finance.view'],
-        section: 'contextual'
-      },
-      {
-        title: 'Budgets',
-        href: '/finance/budgets',
-        icon: CreditCard,
-        permissions: ['finance.view'],
-        section: 'contextual'
-      },
-      {
-        title: 'Taxes',
-        href: '/finance/taxes',
-        icon: Wallet,
-        permissions: ['finance.view'],
-        section: 'contextual'
-      }
-    ],
-    admin: [
-      {
-        title: 'Users',
-        href: '/admin/users',
-        icon: Users,
-        permissions: ['admin.view'],
-        section: 'contextual'
-      },
-      {
-        title: 'Roles',
-        href: '/admin/roles',
-        icon: ShieldCheck,
-        permissions: ['admin.view'],
-        section: 'contextual'
-      },
-      {
-        title: 'Permissions',
-        href: '/admin/permissions',
-        icon: PanelLeft,
-        permissions: ['admin.view'],
-        section: 'contextual'
-      },
-      {
-        title: 'Audit Logs',
-        href: '/admin/audit-logs',
-        icon: BarChart,
-        permissions: ['admin.view'],
-        section: 'contextual'
-      }
-    ],
-    store: [
-      {
-        title: 'Products',
-        href: '/store/products',
-        icon: Store,
-        permissions: ['store.view'],
-        section: 'contextual'
-      },
-      {
-        title: 'Orders',
-        href: '/store/orders',
-        icon: CreditCard,
-        permissions: ['store.view'],
-        section: 'contextual'
-      },
-      {
-        title: 'Customers',
-        href: '/store/customers',
-        icon: Users,
-        permissions: ['store.view'],
-        section: 'contextual'
-      }
-    ],
-    support: [
-      {
-        title: 'Tickets',
-        href: '/support/tickets',
-        icon: Headphones,
-        permissions: ['support.view'],
-        section: 'contextual'
-      },
-      {
-        title: 'Knowledge Base',
-        href: '/support/knowledge-base',
-        icon: BookOpen,
-        permissions: ['support.view'],
-        section: 'contextual'
-      }
-    ]
-  };
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   
-  // Get the current active section items or default to main
-  const activeContextualItems = contextualNavItems[activeSection.toLowerCase()] || contextualNavItems['main'];
+  // Get items for the active section, defaulting to main if section is invalid
+  const normalizedSection = (activeSection?.toLowerCase() || 'main') as SectionName;
+  const sectionItems = SIDEBAR_SECTIONS[normalizedSection] || SIDEBAR_SECTIONS.main;
   
-  // Combine global and contextual navigation items
-  const combinedNavItems = [...globalNavItems, ...activeContextualItems];
+  // Get the current section color theme
+  const sectionColor = SECTION_COLORS[normalizedSection] || SECTION_COLORS.main;
   
-  // Toggle section expansion
-  const toggleSection = (title: string) => {
-    setExpandedSections(prev => ({
+  // Toggle an expandable section
+  const toggleItem = (title: string) => {
+    setExpandedItems(prev => ({
       ...prev,
       [title]: !prev[title]
     }));
   };
   
-  // Check if user has permission for an item
-  const hasPermission = (item: NavItemType) => {
-    if (!item.permissions || item.permissions.length === 0) return true;
-    return item.permissions.some(permission => userPermissions.includes(permission));
-  };
-  
-  // Auto-expand section based on current path
+  // Auto-expand items based on current path
   useEffect(() => {
-    if (!pathname) return;
+    const newExpandedState = { ...expandedItems };
     
-    combinedNavItems.forEach(item => {
+    sectionItems.forEach((item: NavItem) => {
       if (item.children && pathname.startsWith(item.href)) {
-        setExpandedSections(prev => ({ ...prev, [item.title]: true }));
+        newExpandedState[item.title] = true;
       }
     });
-  }, [pathname, combinedNavItems]);
+    
+    setExpandedItems(newExpandedState);
+  }, [pathname, sectionItems]);
+  
+  // Add an effect to monitor when the activeSection changes
+  useEffect(() => {
+    // Set a data attribute on the body to help track section changes
+    if (typeof document !== 'undefined') {
+      document.body.setAttribute('data-active-section', activeSection);
+    }
+  }, [activeSection]);
+  
+  // Handle navigation by using direct window.location
+  const navigate = (href: string) => {
+    // Ensure we're in a browser environment before navigating
+    if (typeof window === 'undefined') return;
+    
+    // Check if we're currently in the finance section via protected page
+    const isFinanceMode = 
+      pathname.startsWith('/protected') && 
+      (activeSection === 'finance' || document.body.getAttribute('data-active-section') === 'finance');
+    
+    // Special case for finance which was previously working
+    if (href === '/finance' || href.startsWith('/finance/')) {
+      // Add section parameter to preserve the finance section
+      window.location.href = `/protected?section=finance`;
+      return;
+    }
+    
+    // If we're in finance mode and navigating to a non-finance URL, 
+    // we need to keep the section parameter
+    if (isFinanceMode && !href.startsWith('/finance/')) {
+      // Keep finance section for any navigation while in finance mode
+      window.location.href = `${href}?section=finance`;
+      return;
+    }
+    
+    window.location.href = href;
+  };
+  
+  // Check if an item or its children match the current path
+  const isItemActive = (href: string) => 
+    pathname === href || pathname.startsWith(href + '/');
   
   return (
-    <nav className="px-2">
-      {/* Render Global Section Heading */}
-      <div className="mb-2 px-3 py-2">
-        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-          Global
-        </h2>
-      </div>
-      
-      {/* Render Global Navigation Items */}
+    <div className="px-2">
+      {/* Global items */}
       <ul className="space-y-1 mb-6">
-        {globalNavItems.filter(hasPermission).map((item) => {
-          const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
-          const isExpanded = expandedSections[item.title];
-          
-          return (
-            <li key={item.href} className="select-none">
-              {item.children ? (
-                <>
-                  {/* Section with children - acts as an accordion */}
-                  <button
-                    onClick={() => toggleSection(item.title)}
-                    className={cn(
-                      "flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors",
-                      isActive
-                        ? "bg-primary/10 text-primary"
-                        : "text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                    )}
-                  >
-                    <item.icon className="h-5 w-5 mr-2" />
-                    <span>{item.title}</span>
-                    <span className="ml-auto">
-                      <ChevronDown 
-                        size={16} 
-                        className={cn(
-                          "transition-transform duration-200", 
-                          isExpanded ? "rotate-180" : ""
-                        )} 
-                      />
-                    </span>
-                  </button>
-                  
-                  {/* Child items */}
-                  {isExpanded && (
-                    <ul className="mt-1 ml-6 space-y-1">
-                      {item.children.map((child) => {
-                        const childPath = `${child.href}`;
-                        const isChildActive = pathname === childPath;
-                        
-                        return (
-                          <li key={childPath}>
-                            <Link
-                              href={childPath}
-                              className={cn(
-                                "flex items-center px-3 py-2 text-sm rounded-md transition-colors",
-                                isChildActive
-                                  ? "bg-primary/10 text-primary"
-                                  : "text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                              )}
-                            >
-                              {child.title}
-                            </Link>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                </>
-              ) : (
-                /* Single navigation item without children */
-                <Link
-                  href={item.href}
-                  className={cn(
-                    "flex items-center px-3 py-2 text-sm rounded-md transition-colors",
-                    isActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                  )}
-                >
-                  <item.icon className="h-5 w-5 mr-2" />
-                  <span>{item.title}</span>
-                </Link>
+        {GLOBAL_ITEMS.map((item: NavItem) => (
+          <li key={item.href}>
+            <button
+              onClick={() => navigate(item.href)}
+              className={cn(
+                "flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors",
+                isItemActive(item.href)
+                  ? sectionColor
+                  : "text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800"
               )}
-            </li>
-          );
-        })}
+              title={collapsed ? item.title : undefined}
+            >
+              <item.icon className={cn("h-5 w-5", collapsed ? "" : "mr-2")} />
+              {!collapsed && <span>{item.title}</span>}
+            </button>
+          </li>
+        ))}
       </ul>
       
-      {/* Render Contextual Section Heading */}
-      <div className="mb-2 px-3 py-2">
-        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-          {activeSection.charAt(0).toUpperCase() + activeSection.slice(1).toLowerCase()}
-        </h2>
-      </div>
+      {/* Section title */}
+      {!collapsed && (
+        <div className="mb-2 px-3 py-2">
+          <h2 className={cn(
+            "text-xs font-semibold uppercase tracking-wider",
+            sectionColor.split(' ')[0] // Use just the text color part
+          )}>
+            {activeSection.charAt(0).toUpperCase() + activeSection.slice(1).toLowerCase()}
+          </h2>
+        </div>
+      )}
       
-      {/* Render Contextual Navigation Items */}
+      {/* Section specific items */}
       <ul className="space-y-1">
-        {activeContextualItems.filter(hasPermission).map((item) => {
-          const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
-          const isExpanded = expandedSections[item.title];
+        {sectionItems.map((item: NavItem) => {
+          const isActive = isItemActive(item.href);
+          const isExpanded = expandedItems[item.title];
+          const hasChildren = item.children && item.children.length > 0;
           
           return (
-            <li key={item.href} className="select-none">
-              {item.children ? (
+            <li key={item.href}>
+              {hasChildren && !collapsed ? (
                 <>
-                  {/* Section with children - acts as an accordion */}
+                  {/* Expandable item with children */}
                   <button
-                    onClick={() => toggleSection(item.title)}
+                    onClick={() => toggleItem(item.title)}
                     className={cn(
                       "flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors",
                       isActive
-                        ? "bg-primary/10 text-primary"
+                        ? sectionColor
                         : "text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800"
                     )}
                   >
                     <item.icon className="h-5 w-5 mr-2" />
                     <span>{item.title}</span>
-                    <span className="ml-auto">
-                      <ChevronDown 
-                        size={16} 
-                        className={cn(
-                          "transition-transform duration-200", 
-                          isExpanded ? "rotate-180" : ""
-                        )} 
-                      />
-                    </span>
+                    <ChevronDown 
+                      className={cn(
+                        "ml-auto h-4 w-4 transition-transform",
+                        isExpanded ? "transform rotate-180" : ""
+                      )}
+                    />
                   </button>
                   
                   {/* Child items */}
-                  {isExpanded && (
+                  {isExpanded && item.children && (
                     <ul className="mt-1 ml-6 space-y-1">
-                      {item.children.map((child) => {
-                        const childPath = `${child.href}`;
-                        const isChildActive = pathname === childPath;
-                        
-                        return (
-                          <li key={childPath}>
-                            <Link
-                              href={childPath}
-                              className={cn(
-                                "flex items-center px-3 py-2 text-sm rounded-md transition-colors",
-                                isChildActive
-                                  ? "bg-primary/10 text-primary"
-                                  : "text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                              )}
-                            >
-                              {child.title}
-                            </Link>
-                          </li>
-                        );
-                      })}
+                      {item.children.map((child: NavChild) => (
+                        <li key={child.href}>
+                          <button
+                            onClick={() => navigate(child.href)}
+                            className={cn(
+                              "flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors",
+                              isItemActive(child.href)
+                                ? sectionColor
+                                : "text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                            )}
+                          >
+                            {child.title}
+                          </button>
+                        </li>
+                      ))}
                     </ul>
                   )}
                 </>
               ) : (
-                /* Single navigation item without children */
-                <Link
-                  href={item.href}
+                // Regular item without children or collapsed state
+                <button
+                  onClick={() => navigate(item.href)}
                   className={cn(
-                    "flex items-center px-3 py-2 text-sm rounded-md transition-colors",
+                    "flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors",
                     isActive
-                      ? "bg-primary/10 text-primary"
+                      ? sectionColor
                       : "text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800"
                   )}
+                  title={collapsed ? item.title : undefined}
                 >
-                  <item.icon className="h-5 w-5 mr-2" />
-                  <span>{item.title}</span>
-                </Link>
+                  <item.icon className={cn("h-5 w-5", collapsed ? "" : "mr-2")} />
+                  {!collapsed && <span>{item.title}</span>}
+                </button>
               )}
             </li>
           );
         })}
       </ul>
-    </nav>
+    </div>
   );
 }
 

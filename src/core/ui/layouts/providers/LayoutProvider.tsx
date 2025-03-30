@@ -1,14 +1,23 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
-// Define types for module configuration
-export type ModuleType = 'main' | 'lms' | 'admin' | 'payments' | 'finance' | 'resources' | 'analytics' | 'support';
+// Define allowed module types
+export type ModuleType = 
+  | 'main' 
+  | 'lms' 
+  | 'admin' 
+  | 'finance' 
+  | 'payments' 
+  | 'resources' 
+  | 'analytics' 
+  | 'support'
+  | 'store'; // Add store to allowed modules
+export type LayoutType = 'dashboard' | 'minimal' | 'auth' | 'marketing';
 
 // Define types for the layout context
-type LayoutContextType = {
+export type LayoutContextType = {
   // Sidebar state
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
@@ -40,15 +49,26 @@ type LayoutContextType = {
   setActiveSection: (section: string) => void;
   
   // Layout configuration
-  layoutType: 'dashboard' | 'minimal' | 'auth' | 'marketing';
-  setLayoutType: (type: 'dashboard' | 'minimal' | 'auth' | 'marketing') => void;
+  layoutType: LayoutType;
+  setLayoutType: (type: LayoutType) => void;
   
   // New properties
   isSidebarOpen: boolean;
   scrollY: number;
   layoutId: string;
   route: string;
+  
+  // New properties for sidebar width
+  sidebarExpanded: boolean;
+  setSidebarExpanded: (expanded: boolean) => void;
+  sidebarWidth: number;
+  expandedSidebarWidth: number;
+  collapsedSidebarWidth: number;
 };
+
+// Default values with meaningful constants
+const EXPANDED_SIDEBAR_WIDTH = 240;
+const COLLAPSED_SIDEBAR_WIDTH = 60;
 
 // Create the context with undefined default value
 const LayoutContext = createContext<LayoutContextType>({
@@ -76,13 +96,28 @@ const LayoutContext = createContext<LayoutContextType>({
   sidebarOpen: false,
   setSidebarOpen: () => {},
   setTheme: () => {},
+  sidebarExpanded: true,
+  setSidebarExpanded: () => {},
+  sidebarWidth: EXPANDED_SIDEBAR_WIDTH,
+  expandedSidebarWidth: EXPANDED_SIDEBAR_WIDTH,
+  collapsedSidebarWidth: COLLAPSED_SIDEBAR_WIDTH
 });
+
+type LayoutProviderProps = {
+  children: ReactNode;
+  initialModule?: ModuleType;
+  initialLayoutType?: LayoutType;
+};
 
 /**
  * LayoutProvider component provides global layout state and functionality
  * to all child components in the application.
  */
-export function LayoutProvider({ children }: { children: ReactNode }) {
+export function LayoutProvider({ 
+  children, 
+  initialModule = 'main',
+  initialLayoutType = 'dashboard'
+}: LayoutProviderProps) {
   // Sidebar state
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
@@ -104,13 +139,13 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
   const [viewportHeight, setViewportHeight] = useState(0);
   
   // Module state management
-  const [currentModule, setCurrentModule] = useState<ModuleType>('main');
+  const [currentModule, setCurrentModule] = useState<ModuleType>(initialModule);
   
   // Active section for contextual navigation
   const [activeSection, setActiveSection] = useState<string>('main');
   
   // Layout type
-  const [layoutType, setLayoutType] = useState<'dashboard' | 'minimal' | 'auth' | 'marketing'>('dashboard');
+  const [layoutType, setLayoutType] = useState<LayoutType>(initialLayoutType);
   
   // Add new state for sidebar visibility
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -118,36 +153,104 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const route = usePathname() || '/';
   
-  // Effect to detect current module from URL path
+  // New properties for sidebar width
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  
+  // Calculate sidebar width based on state
+  const sidebarWidth = sidebarExpanded ? EXPANDED_SIDEBAR_WIDTH : COLLAPSED_SIDEBAR_WIDTH;
+  
+  // Handle section change when route changes
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    // Check for any section parameter in the URL
+    if (route.includes('section=')) {
+      // Extract section from the URL parameter
+      const sectionMatch = route.match(/section=([^&]+)/);
+      if (sectionMatch && sectionMatch[1]) {
+        const sectionFromUrl = sectionMatch[1].toLowerCase(); // Normalize to lowercase
+        
+        console.log(`Found section in URL: ${sectionFromUrl}`);
+        
+        setActiveSection(sectionFromUrl);
+        setCurrentModule(sectionFromUrl as ModuleType);
+        
+        // Store in localStorage for state persistence across refreshes
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('activeSection', sectionFromUrl);
+        }
+        return; // Skip further checks
+      }
+    }
     
-    const path = window.location.pathname;
-    
-    if (path.startsWith('/dashboard') || path.startsWith('/protected')) {
-      setCurrentModule('main');
+    // Default section detection based on routes
+    // Determine which section is active based on the current route
+    if (route.startsWith('/dashboard') || route === '/') {
       setActiveSection('main');
-    } else if (path.startsWith('/lms')) {
-      setCurrentModule('lms');
+      setCurrentModule('main');
+    } else if (route.startsWith('/lms')) {
       setActiveSection('lms');
-    } else if (path.startsWith('/admin')) {
-      setCurrentModule('admin');
+      setCurrentModule('lms');
+    } else if (route.startsWith('/admin')) {
       setActiveSection('admin');
-    } else if (path.startsWith('/payments')) {
-      setCurrentModule('payments');
+      setCurrentModule('admin');
+    } else if (route.startsWith('/payments')) {
       setActiveSection('payments');
-    } else if (path.startsWith('/finance')) {
-      setCurrentModule('finance');
+      setCurrentModule('payments');
+    } else if (route.startsWith('/finance')) {
       setActiveSection('finance');
-    } else if (path.startsWith('/resources')) {
-      setCurrentModule('resources');
-      setActiveSection('resources');
-    } else if (path.startsWith('/analytics')) {
-      setCurrentModule('analytics');
-      setActiveSection('analytics');
-    } else if (path.startsWith('/support')) {
-      setCurrentModule('support');
+      setCurrentModule('finance');
+    } else if (route.startsWith('/international')) {
+      setActiveSection('main'); // International is part of the main module
+      setCurrentModule('main');
+    } else if (route.startsWith('/support')) {
       setActiveSection('support');
+      setCurrentModule('support');
+    } else if (route.startsWith('/store')) {
+      setActiveSection('store');
+      setCurrentModule('store');
+    } else if (route.startsWith('/resources')) {
+      setActiveSection('resources');
+      setCurrentModule('resources');
+    } else if (route.startsWith('/analytics')) {
+      setActiveSection('analytics');
+      setCurrentModule('analytics');
+    } else if (route.startsWith('/blockchain')) {
+      setActiveSection('main'); // Blockchain is part of the main module
+      setCurrentModule('main');
+    }
+
+    // For mobile, default to sidebar closed on route change
+    if (isMobile && route !== '/') {
+      setSidebarOpen(false);
+    }
+  }, [route, isMobile]);
+  
+  // Effect to restore section from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedSection = localStorage.getItem('activeSection');
+      if (savedSection) {
+        // Always normalize the section to lowercase
+        const normalizedSection = savedSection.toLowerCase();
+        console.log("Restoring section from localStorage:", normalizedSection);
+        
+        // Set both the active section and current module
+        setActiveSection(normalizedSection);
+        setCurrentModule(normalizedSection as ModuleType);
+        
+        // If we're on the protected page but missing the section parameter,
+        // update the URL to include it for consistency
+        if (typeof window !== 'undefined' && 
+            window.location.pathname === '/protected' && 
+            !window.location.search.includes('section=')) {
+          
+          console.log("Adding section parameter to URL:", normalizedSection);
+          window.history.replaceState(
+            null,
+            '',
+            `/protected?section=${normalizedSection}`
+          );
+        }
+      }
     }
   }, []);
   
@@ -265,6 +368,28 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
     }
   }, []);
   
+  // Add a global click handler to close any open dropdown menus
+  useEffect(() => {
+    // Simpler approach - just handle the close-all-dropdowns event
+    const handleDropdownEvent = () => {
+      // For components listening to this event
+      document.dispatchEvent(new CustomEvent('close-all-dropdowns'));
+    };
+    
+    // Add a minimal event listener for ESC key to close dropdowns
+    const handleEscKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleDropdownEvent();
+      }
+    };
+    
+    document.addEventListener('keydown', handleEscKey);
+    
+    return () => {
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, []);
+  
   // Provide context to children
   return (
     <LayoutContext.Provider
@@ -293,6 +418,11 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
         layoutId,
         route,
         scrollY: 0,
+        sidebarExpanded,
+        setSidebarExpanded,
+        sidebarWidth,
+        expandedSidebarWidth: EXPANDED_SIDEBAR_WIDTH,
+        collapsedSidebarWidth: COLLAPSED_SIDEBAR_WIDTH
       }}
     >
       {children}

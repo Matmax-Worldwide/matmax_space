@@ -1,6 +1,7 @@
 "use client";
 
-import DashboardLayout from '../../src/core/ui/layouts/templates/DashboardLayout';
+import { Activity, ArrowUp, CreditCard, DollarSign, Users } from 'lucide-react';
+import { DashboardLayout } from '../../src/core/ui/layouts/templates/DashboardLayout';
 
 export default function DashboardPage() {
   return (

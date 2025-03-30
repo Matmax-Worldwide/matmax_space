@@ -6,7 +6,7 @@ type LogoProps = {
   className?: string;
   alt?: string;
   darkModeInvert?: boolean;
-  size?: 'default' | 'large' | 'auth';
+  size?: 'default' | 'large' | 'auth' | 'small';
   lightBackground?: boolean; // Whether displaying on light background
 };
 
@@ -14,6 +14,7 @@ type LogoProps = {
  * Logo component for MatMax Wellness Studio
  * Accepts className for custom styling and handles dark mode inversion
  * Size prop allows for different predefined sizes:
+ * - small: Compact size for mobile (90x30)
  * - default: Original size for protected pages (120x40)
  * - large: Slightly larger size (160x60)  
  * - auth: Very large size for auth pages (240x90)
@@ -29,6 +30,7 @@ export function Logo({
   
   // Set dimensions based on size prop
   const dimensions = {
+    small: { width: 90, height: 30 },
     default: { width: 120, height: 40 },
     large: { width: 160, height: 60 },
     auth: { width: 240, height: 90 }

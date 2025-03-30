@@ -1,6 +1,8 @@
 import React from 'react';
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
+import Footer from '@/src/core/ui/layouts/components/Footer';
+import { DashboardLayout } from '@/src/core/ui/layouts/templates/DashboardLayout';
 
 // Only export the runtime
 export const runtime = 'edge';
