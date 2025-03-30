@@ -335,15 +335,15 @@ function Header({
   const activeModule = getCurrentModule();
   
   return (
-    <header className="w-full h-16 bg-background border-b border-border sticky top-0 z-40">
-      <div className="w-full h-full flex items-center justify-between px-3 md:px-4 relative">
+    <header className="w-full h-16 bg-background border-b border-border sticky top-0 z-[100]">
+      <div className="w-full h-full flex items-center px-3 md:px-4 relative">
         {/* Left Section */}
-        <div className="flex items-center h-full w-[50%] overflow-hidden">
+        <div className="flex items-center h-full flex-shrink overflow-hidden">
           {/* Mobile menu toggle - only shown on mobile/tablet */}
           {showMobileMenu && layoutType === 'dashboard' && isMobileView && (
             <button 
               onClick={toggleSidebar}
-              className="mr-2 p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 flex items-center justify-center"
+              className="mr-2 p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 flex items-center justify-center flex-shrink-0"
               aria-label="Toggle sidebar menu"
             >
               <Menu size={20} />
@@ -354,21 +354,21 @@ function Header({
           {isMobileView ? (
             <div className="flex-1">{/* No page title, just empty space */}</div>
           ) : (
-            <div className="overflow-hidden">
+            <div className="overflow-hidden max-w-[500px]">
               <HeaderNav />
             </div>
           )}
         </div>
         
-        {/* Right Section */}
-        <div className="flex items-center h-full space-x-3 w-[50%] justify-end">
+        {/* Right Section - using ml-auto to push to the right */}
+        <div className="flex items-center h-full space-x-3 ml-auto flex-shrink-0">
           {/* Module Dropdown - Only on mobile */}
           {isMobileView && layoutType === 'dashboard' && (
             <div className="h-full flex items-center">
               <button
                 onClick={toggleMobileNav}
                 className={cn(
-                  "flex items-center justify-center px-3 py-1.5 rounded-md text-white font-medium shadow-sm h-8",
+                  "flex items-center justify-center px-3 py-1.5 rounded-md text-white font-medium shadow-sm h-8 flex-shrink-0",
                   "transition-all duration-200",
                   activeModule?.color?.replace('bg-', '') || 'bg-gradient-to-r from-blue-500 to-blue-600'
                 )}
@@ -393,7 +393,7 @@ function Header({
                 <div className="h-full flex items-center">
                   <button
                     onClick={() => setOpen({ ...open, wallet: !open.wallet, language: false, user: false })}
-                    className="flex items-center px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-xs h-8"
+                    className="flex items-center px-3 py-1.5 rounded-full bg-gradient-to-r from-blue-400 to-blue-500 text-white text-xs h-8 shadow-sm flex-shrink-0"
                     title="Connect Wallet"
                     aria-label="Connect blockchain wallet"
                   >
@@ -405,7 +405,7 @@ function Header({
               )}
               
               {/* Language selector */}
-              <div className="h-full flex items-center">
+              <div className="h-full flex items-center flex-shrink-0">
                 <button
                   type="button"
                   onClick={() => setOpen({ ...open, language: !open.language, wallet: false, user: false })}
@@ -421,7 +421,7 @@ function Header({
           
           {/* Actions Menu Button - Shown only on small screens */}
           {isExtraSmall && layoutType !== 'auth' && (
-            <div className="h-full flex items-center">
+            <div className="h-full flex items-center flex-shrink-0">
               <button
                 onClick={toggleActionsMenu}
                 className="flex items-center justify-center p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 h-8 w-8"
@@ -433,10 +433,10 @@ function Header({
           )}
           
           {/* User menu - Always visible */}
-          <div className="h-full flex items-center">
+          <div className="h-full flex items-center flex-shrink-0">
             <button 
               onClick={() => setOpen({ ...open, user: !open.user, wallet: false, language: false })}
-              className="h-8 w-8 flex items-center justify-center rounded-full bg-primary/10 hover:bg-primary/20 text-primary"
+              className="h-8 w-8 flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 text-white shadow-sm"
               aria-label="User menu"
               title="Account menu"
             >
