@@ -613,7 +613,11 @@ function Header({
       )}
       
       {/* Settings Menu */}
-      <SettingsMenu isOpen={settingsMenuOpen} onClose={() => setSettingsMenuOpen(false)} />
+      <SettingsMenu 
+        isOpen={settingsMenuOpen} 
+        onClose={() => setSettingsMenuOpen(false)} 
+        settingsMenuVisible={settingsMenuVisible} 
+      />
     </header>
   );
 }
@@ -622,7 +626,7 @@ function Header({
  * Settings Menu Component
  * This appears when the Manage Account button is clicked
  */
-function SettingsMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+function SettingsMenu({ isOpen, onClose, settingsMenuVisible }: { isOpen: boolean; onClose: () => void; settingsMenuVisible: boolean }) {
   if (!isOpen) return null;
   
   const [showLanguages, setShowLanguages] = useState(false);
@@ -674,7 +678,7 @@ function SettingsMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
         <div 
           className={cn(
             "fixed inset-0 bg-white dark:bg-neutral-900 z-50 flex flex-col transition-transform duration-300 ease-in-out",
-            isOpen ? "translate-x-0" : "translate-x-full"
+            settingsMenuVisible ? "translate-x-0" : "translate-x-full"
           )}
         >
           {/* Menu Header */}
