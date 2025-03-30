@@ -31,6 +31,10 @@ type LayoutContextType = {
   currentModule: ModuleType;
   setCurrentModule: (module: ModuleType) => void;
   
+  // Active section for contextual navigation
+  activeSection: string;
+  setActiveSection: (section: string) => void;
+  
   // Layout configuration
   layoutType: 'dashboard' | 'minimal' | 'auth' | 'marketing';
   setLayoutType: (type: 'dashboard' | 'minimal' | 'auth' | 'marketing') => void;
@@ -67,6 +71,9 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
   // Module state management
   const [currentModule, setCurrentModule] = useState<ModuleType>('main');
   
+  // Active section for contextual navigation
+  const [activeSection, setActiveSection] = useState<string>('main');
+  
   // Layout type
   const [layoutType, setLayoutType] = useState<'dashboard' | 'minimal' | 'auth' | 'marketing'>('dashboard');
   
@@ -78,20 +85,28 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
     
     if (path.startsWith('/dashboard') || path.startsWith('/protected')) {
       setCurrentModule('main');
+      setActiveSection('main');
     } else if (path.startsWith('/lms')) {
       setCurrentModule('lms');
+      setActiveSection('lms');
     } else if (path.startsWith('/admin')) {
       setCurrentModule('admin');
+      setActiveSection('admin');
     } else if (path.startsWith('/payments')) {
       setCurrentModule('payments');
+      setActiveSection('payments');
     } else if (path.startsWith('/finance')) {
       setCurrentModule('finance');
+      setActiveSection('finance');
     } else if (path.startsWith('/resources')) {
       setCurrentModule('resources');
+      setActiveSection('resources');
     } else if (path.startsWith('/analytics')) {
       setCurrentModule('analytics');
+      setActiveSection('analytics');
     } else if (path.startsWith('/support')) {
       setCurrentModule('support');
+      setActiveSection('support');
     }
   }, []);
   
@@ -229,6 +244,8 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
         viewportHeight,
         currentModule,
         setCurrentModule,
+        activeSection,
+        setActiveSection,
         layoutType,
         setLayoutType
       }}
