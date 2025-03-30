@@ -1,6 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 // Define types for module configuration
 export type ModuleType = 'main' | 'lms' | 'admin' | 'payments' | 'finance' | 'resources' | 'analytics' | 'support';
@@ -40,10 +42,37 @@ type LayoutContextType = {
   // Layout configuration
   layoutType: 'dashboard' | 'minimal' | 'auth' | 'marketing';
   setLayoutType: (type: 'dashboard' | 'minimal' | 'auth' | 'marketing') => void;
+  
+  // New properties
+  isSidebarOpen: boolean;
+  scrollY: number;
+  layoutId: string;
+  route: string;
 };
 
 // Create the context with undefined default value
-const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
+const LayoutContext = createContext<LayoutContextType>({
+  isMobile: false,
+  isTablet: false,
+  isDesktop: true,
+  isLandscape: true,
+  isPortrait: false,
+  viewportWidth: 1920,
+  viewportHeight: 1080,
+  theme: 'light',
+  isSmallMobile: false,
+  scrollY: 0,
+  isSidebarOpen: true,
+  toggleSidebar: () => {},
+  layoutId: 'default',
+  route: '/',
+  currentModule: 'main',
+  setCurrentModule: () => {},
+  activeSection: 'main',
+  setActiveSection: () => {},
+  layoutType: 'dashboard',
+  setLayoutType: () => {},
+});
 
 /**
  * LayoutProvider component provides global layout state and functionality
@@ -78,6 +107,17 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
   
   // Layout type
   const [layoutType, setLayoutType] = useState<'dashboard' | 'minimal' | 'auth' | 'marketing'>('dashboard');
+  
+  // Add new state for sidebar visibility
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [layoutId, setLayoutId] = useState('default');
+  const router = useRouter();
+  const route = usePathname() || '/';
+  
+  // Function to toggle sidebar
+  const toggleSidebar = useCallback(() => {
+    setIsSidebarOpen(prev => !prev);
+  }, []);
   
   // Effect to detect current module from URL path
   useEffect(() => {
@@ -249,7 +289,13 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
         activeSection,
         setActiveSection,
         layoutType,
-        setLayoutType
+        setLayoutType,
+        isSidebarOpen,
+        setIsSidebarOpen,
+        layoutId,
+        setLayoutId,
+        route,
+        scrollY: 0,
       }}
     >
       {children}

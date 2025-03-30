@@ -23,89 +23,67 @@ type DashboardLayoutProps = {
  * Main layout for authenticated sections of the application
  * Optimized for mobile with responsive layout adaptations and performance enhancements
  */
-function DashboardLayout({
-  children,
-  showSidebar = true,
-  showFooter = true,
-  contentClassName,
-  maxWidth = '2xl',
-  padding = 'md'
-}: DashboardLayoutProps) {
+export function DashboardLayout({ children }: { children: ReactNode }) {
+  const DashboardContent = () => {
+    const { 
+      isMobile, 
+      isTablet, 
+      isSidebarOpen, 
+      toggleSidebar, 
+      layoutId, 
+      route 
+    } = useLayout();
+    
+    return (
+      <div className="flex w-full overflow-x-hidden">
+        {/* Sidebar component (hidden on small devices when collapsed) */}
+        <div 
+          className={cn(
+            "fixed inset-y-0 z-50 flex flex-col transition-transform duration-300 ease-in-out bg-sidebar border-r border-border",
+            isSidebarOpen 
+              ? "translate-x-0 shadow-lg"
+              : "-translate-x-full md:translate-x-0 md:w-[70px]",
+            isMobile ? "w-[280px]" : "w-[280px]"
+          )}
+        >
+          {/* ... keep existing sidebar contents ... */}
+        </div>
+        
+        {/* Main content area - add max-width to prevent overflow */}
+        <div className={cn(
+          "flex-1 flex flex-col min-h-screen relative transition-all duration-300 ease-in-out",
+          isSidebarOpen 
+            ? "ml-0 md:ml-[280px]" 
+            : "ml-0 md:ml-[70px]",
+        )}>
+          <div className="w-full max-w-[100vw] overflow-x-hidden">
+            {/* Mobile Header */}
+            <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+            
+            {/* Main Content */}
+            <div className="flex-1 w-full max-w-full overflow-hidden">
+              {children}
+            </div>
+          </div>
+        </div>
+        
+        {/* Overlay for mobile sidebar */}
+        {isMobile && isSidebarOpen && (
+          <div 
+            className="fixed inset-0 z-40 bg-black/50" 
+            onClick={() => toggleSidebar()}
+          />
+        )}
+      </div>
+    );
+  };
+
   return (
     <LayoutProvider>
-      <DashboardLayoutContent
-        showSidebar={showSidebar}
-        showFooter={showFooter}
-        contentClassName={contentClassName}
-        maxWidth={maxWidth}
-        padding={padding}
-      >
-        {children}
-      </DashboardLayoutContent>
+      <DashboardContent />
     </LayoutProvider>
   );
 }
-
-// Separate component to use the useLayout hook
-const DashboardLayoutContent = ({
-  children,
-  showSidebar,
-  showFooter,
-  contentClassName,
-  maxWidth,
-  padding
-}: DashboardLayoutProps) => {
-  const { isMobile, isLandscape, isPortrait, viewportHeight } = useLayout();
-  
-  // Handle specially small viewport heights in landscape mode
-  const isCompactLayout = isLandscape && viewportHeight < 600;
-  
-  return (
-    <div 
-      className={cn(
-        "flex min-h-screen bg-background will-change-contents",
-        // For small screens in landscape, use a more compact layout
-        isCompactLayout && "overflow-auto"
-      )}
-    >
-      {/* Sidebar - conditionally rendered */}
-      {showSidebar && <Sidebar />}
-      
-      {/* Main content area */}
-      <div 
-        className={cn(
-          "flex flex-col w-full transition-all duration-300",
-          showSidebar && "md:ml-64", // Offset for the sidebar
-          // Use hardware acceleration for smoother transitions
-          "will-change-transform backface-visibility-hidden"
-        )}
-      >
-        {/* Header with sticky positioning */}
-        <Header />
-        
-        {/* Main content with flex grow */}
-        <main 
-          className={cn(
-            "flex-1",
-            // Optimize main container for smaller screens
-            isCompactLayout ? "overflow-auto" : ""
-          )}
-        >
-          <PageContainer 
-            className={contentClassName}
-            maxWidth={maxWidth}
-            padding={padding}
-          >
-            {children}
-          </PageContainer>
-        </main>
-        
-        {/* Footer - conditionally rendered and optimized for mobile */}
-        {showFooter && <Footer className={isCompactLayout ? "py-3" : ""} />}
-      </div>
-    </div>
-  );
-};
 
 // Use memo for performance optimization
 export default memo(DashboardLayout);
