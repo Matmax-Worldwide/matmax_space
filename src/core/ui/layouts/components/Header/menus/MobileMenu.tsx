@@ -289,10 +289,18 @@ export function MobileMenu({
           </div>
         </div>
         
-        {/* Global Actions */}
+        {/* Global Actions, renamed to General Menu */}
         <div className="p-4 border-t border-neutral-200 dark:border-neutral-700">
-          <p className="text-xs uppercase font-semibold text-muted-foreground mb-3 pl-2">Global Actions</p>
+          <p className="text-xs uppercase font-semibold text-muted-foreground mb-3 pl-2">General Menu</p>
           <div className="flex flex-col space-y-2">
+            <button 
+              onClick={() => router.push('/dashboard')}
+              className="flex items-center p-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200 transform hover:scale-[1.02]"
+            >
+              <BarChart3 className="h-5 w-5 mr-3 text-muted-foreground" />
+              <span>Dashboard</span>
+            </button>
+            
             <button className="flex items-center p-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200 transform hover:scale-[1.02]">
               <Bell className="h-5 w-5 mr-3 text-muted-foreground" />
               <span>Notifications</span>
