@@ -346,11 +346,11 @@ function Header({
       <div className="flex items-center justify-end space-x-3">
         {/* Mobile navigation dropdown */}
         {isMobileView && layoutType === 'dashboard' && (
-          <div className="relative">
+          <div className="relative h-10 flex items-center">
             <button
               onClick={toggleMobileNav}
               className={cn(
-                "flex items-center justify-center px-4 py-2 rounded-md text-white font-medium shadow-sm",
+                "flex items-center justify-center px-4 py-2 rounded-md text-white font-medium shadow-sm h-10",
                 "transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-primary/30",
                 "will-change-transform active:scale-95 touch-manipulation",
                 activeModule?.color?.replace('bg-', '') || 'bg-gradient-to-r from-blue-500 to-blue-600'
@@ -410,13 +410,21 @@ function Header({
         )}
         
         {/* Blockchain wallet connection */}
-        {showWalletConnect && layoutType !== 'auth' && <BlockchainWallet />}
+        {showWalletConnect && layoutType !== 'auth' && (
+          <div className="h-10 flex items-center">
+            <BlockchainWallet />
+          </div>
+        )}
         
         {/* Language selector */}
-        <LanguageSelector />
+        <div className="h-10 flex items-center">
+          <LanguageSelector />
+        </div>
         
         {/* User menu */}
-        <UserMenu />
+        <div className="h-10 flex items-center">
+          <UserMenu />
+        </div>
       </div>
     </header>
   );
