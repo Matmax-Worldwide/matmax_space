@@ -49,6 +49,7 @@ export function MobileMenu({
       title: 'Main Dashboard',
       icon: BarChart3,
       color: 'from-blue-500 to-blue-700',
+      bgColor: 'bg-blue-500',
       textColor: 'text-blue-500',
       description: 'Your dashboard overview and analytics.',
     },
@@ -57,6 +58,7 @@ export function MobileMenu({
       title: 'Learning Management',
       icon: School,
       color: 'from-green-500 to-green-700',
+      bgColor: 'bg-green-500',
       textColor: 'text-green-500',
       description: 'Courses, lessons and educational content.',
     },
@@ -65,6 +67,7 @@ export function MobileMenu({
       title: 'Admin Panel',
       icon: Book,
       color: 'from-purple-500 to-purple-700',
+      bgColor: 'bg-purple-500',
       textColor: 'text-purple-500',
       description: 'User management and system settings.',
     },
@@ -73,6 +76,7 @@ export function MobileMenu({
       title: 'Payments',
       icon: CreditCard,
       color: 'from-amber-500 to-amber-700',
+      bgColor: 'bg-amber-500',
       textColor: 'text-amber-500',
       description: 'Transactions, billing and payment history.',
     },
@@ -81,6 +85,7 @@ export function MobileMenu({
       title: 'Finance',
       icon: BarChart3,
       color: 'from-red-500 to-red-700',
+      bgColor: 'bg-red-500',
       textColor: 'text-red-500',
       description: 'Financial reporting and analytics.',
     },
@@ -89,10 +94,20 @@ export function MobileMenu({
       title: 'Store',
       icon: ShoppingBag,
       color: 'from-sky-500 to-sky-700',
+      bgColor: 'bg-sky-500',
       textColor: 'text-sky-500',
       description: 'Products, purchases, and marketplace.',
     },
   ];
+  
+  // Get current section data
+  const getCurrentSectionData = () => {
+    const normalizedSection = currentSectionId?.toLowerCase() || 'main';
+    return SECTIONS.find(item => item.id.toLowerCase() === normalizedSection) || SECTIONS[0];
+  };
+  
+  const currentSectionData = getCurrentSectionData();
+  const Icon = currentSectionData.icon;
   
   const handleSectionClick = (sectionId: string) => {
     if (onSectionSelect) {
@@ -129,17 +144,49 @@ export function MobileMenu({
         )}
       >
         {/* Mobile Menu Header */}
-        <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-700">
-          <h2 className="font-bold text-lg">Menu</h2>
-          <button 
-            onClick={onClose}
-            className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
+        <div className="flex flex-col border-b border-neutral-200 dark:border-neutral-700">
+          {/* Top header with close button */}
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center">
+              <h2 className="font-bold text-lg">Menu</h2>
+              <div className={cn(
+                "ml-2 px-2 py-0.5 rounded-full text-xs font-semibold text-white",
+                currentSectionData.bgColor
+              )}>
+                {currentSectionData.title}
+              </div>
+            </div>
+            <button 
+              onClick={onClose}
+              className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          
+          {/* Current Module Display */}
+          <div className="px-4 pb-4 flex items-center">
+            <div className={cn(
+              "w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br mr-3",
+              currentSectionData.color
+            )}>
+              <Icon className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h3 className={cn(
+                "font-medium",
+                currentSectionData.textColor
+              )}>
+                {currentSectionData.title}
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                {currentSectionData.description}
+              </p>
+            </div>
+          </div>
         </div>
         
         {/* User Profile */}
@@ -163,10 +210,10 @@ export function MobileMenu({
         <div className="flex-1 overflow-y-auto">
           {/* Modules Selection */}
           <div className="p-4">
-            <p className="text-xs uppercase font-semibold text-muted-foreground mb-3 pl-2">Modules</p>
+            <p className="text-xs uppercase font-semibold text-muted-foreground mb-3 pl-2">Switch Module</p>
             <div className="space-y-3">
               {SECTIONS.map((section, index) => {
-                const Icon = section.icon;
+                const SectionIcon = section.icon;
                 const isActive = section.id.toLowerCase() === currentSectionId?.toLowerCase();
                 
                 return (
@@ -189,7 +236,7 @@ export function MobileMenu({
                       "w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br mr-3 transition-transform duration-300 hover:scale-110",
                       section.color
                     )}>
-                      <Icon className="h-5 w-5 text-white" />
+                      <SectionIcon className="h-5 w-5 text-white" />
                     </div>
                     <div>
                       <h3 className={cn(
@@ -205,6 +252,90 @@ export function MobileMenu({
                   </button>
                 );
               })}
+            </div>
+          </div>
+          
+          {/* Module-specific options */}
+          <div className="p-4 pt-0">
+            <p className="text-xs uppercase font-semibold text-muted-foreground mb-3 pl-2">{currentSectionData.title} Options</p>
+            <div className="space-y-2">
+              {currentSectionId === 'main' && (
+                <>
+                  <button className="flex items-center w-full p-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200 transform hover:scale-[1.02]">
+                    <span className="mr-3">📊</span>
+                    <span>Dashboard</span>
+                  </button>
+                  <button className="flex items-center w-full p-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200 transform hover:scale-[1.02]">
+                    <span className="mr-3">🌐</span>
+                    <span>Analytics</span>
+                  </button>
+                </>
+              )}
+              
+              {currentSectionId === 'lms' && (
+                <>
+                  <button className="flex items-center w-full p-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200 transform hover:scale-[1.02]">
+                    <span className="mr-3">📚</span>
+                    <span>Courses</span>
+                  </button>
+                  <button className="flex items-center w-full p-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200 transform hover:scale-[1.02]">
+                    <span className="mr-3">👨‍🎓</span>
+                    <span>Students</span>
+                  </button>
+                </>
+              )}
+              
+              {currentSectionId === 'admin' && (
+                <>
+                  <button className="flex items-center w-full p-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200 transform hover:scale-[1.02]">
+                    <span className="mr-3">👥</span>
+                    <span>Users</span>
+                  </button>
+                  <button className="flex items-center w-full p-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200 transform hover:scale-[1.02]">
+                    <span className="mr-3">🔑</span>
+                    <span>Roles</span>
+                  </button>
+                </>
+              )}
+              
+              {currentSectionId === 'payments' && (
+                <>
+                  <button className="flex items-center w-full p-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200 transform hover:scale-[1.02]">
+                    <span className="mr-3">💳</span>
+                    <span>Transactions</span>
+                  </button>
+                  <button className="flex items-center w-full p-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200 transform hover:scale-[1.02]">
+                    <span className="mr-3">📝</span>
+                    <span>Invoices</span>
+                  </button>
+                </>
+              )}
+              
+              {currentSectionId === 'finance' && (
+                <>
+                  <button className="flex items-center w-full p-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200 transform hover:scale-[1.02]">
+                    <span className="mr-3">📈</span>
+                    <span>Reports</span>
+                  </button>
+                  <button className="flex items-center w-full p-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200 transform hover:scale-[1.02]">
+                    <span className="mr-3">💰</span>
+                    <span>Budgets</span>
+                  </button>
+                </>
+              )}
+              
+              {currentSectionId === 'store' && (
+                <>
+                  <button className="flex items-center w-full p-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200 transform hover:scale-[1.02]">
+                    <span className="mr-3">🛍️</span>
+                    <span>Products</span>
+                  </button>
+                  <button className="flex items-center w-full p-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200 transform hover:scale-[1.02]">
+                    <span className="mr-3">📦</span>
+                    <span>Orders</span>
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
