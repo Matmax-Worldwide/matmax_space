@@ -326,12 +326,12 @@ function Header({
   
   return (
     <header className={cn(
-      "w-full h-16 flex items-center justify-between px-2 sm:px-4 overflow-visible",
+      "w-full h-16 bg-background border-b border-border overflow-visible",
       sticky && "sticky top-0 z-40",
-      transparent ? "bg-transparent" : "bg-background border-b border-border",
+      transparent && "bg-transparent border-none",
       className
     )}>
-      <div className="container mx-auto flex items-center justify-between px-1 sm:px-2">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full flex items-center justify-between">
         {/* Left Section */}
         <div className="flex items-center">
           {/* Mobile menu toggle - only shown on mobile/tablet */}
