@@ -344,9 +344,13 @@ function Header({
               {/* Hamburger menu button */}
               {showMobileMenu && (
                 <button 
-                  onClick={toggleSidebar}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    setMobileMenuOpen(true);
+                  }}
                   className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-                  aria-label="Toggle sidebar"
+                  aria-label="Toggle main menu"
                   data-menu="toggle"
                 >
                   <Menu className="h-5 w-5 text-muted-foreground" />
@@ -500,6 +504,107 @@ function Header({
               <p className="text-sm text-muted-foreground">
                 Switch between different modules to access specific features and functionality.
               </p>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Mobile Sidebar Menu - Slides in from left */}
+      {isMobileView && showMobileMenu && mobileMenuOpen && (
+        <div 
+          className={cn(
+            "fixed inset-0 bg-white dark:bg-neutral-900 z-50 flex flex-col transition-transform duration-300 ease-in-out",
+            menuVisible ? "translate-x-0" : "-translate-x-full"
+          )}
+        >
+          {/* Menu Header */}
+          <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-700">
+            <h2 className="font-bold text-lg">Main Menu</h2>
+            <button 
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          
+          {/* Menu Options - Scrollable */}
+          <div className="flex-1 overflow-y-auto p-4">
+            <div className="space-y-3">
+              {/* If current module has children, display them */}
+              {currentSectionData.children && currentSectionData.children.length > 0 && (
+                <>
+                  <div className="flex items-center mb-2">
+                    <currentSectionData.icon className={cn(
+                      "w-5 h-5 mr-2",
+                      currentSectionData.color.replace('from-', 'text-').split(' ')[0]
+                    )} />
+                    <h3 className={cn(
+                      "font-bold",
+                      currentSectionData.color.replace('from-', 'text-').split(' ')[0]
+                    )}>{currentSectionData.title} NAVIGATION</h3>
+                  </div>
+                  
+                  {currentSectionData.children.map((child, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        router.push(child.href);
+                      }}
+                      className={cn(
+                        "flex w-full items-center px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800",
+                        pathname === child.href ? `bg-gradient-to-r ${currentSectionData.color} text-white` : ""
+                      )}
+                    >
+                      <span className="text-base font-medium">{child.title}</span>
+                    </button>
+                  ))}
+                  
+                  <div className="h-4"></div>
+                </>
+              )}
+              
+              {/* Common navigation links */}
+              <div className="mb-2">
+                <h3 className="text-sm font-medium text-muted-foreground mb-1 px-1">Quick Access</h3>
+              </div>
+              
+              <button 
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  router.push('/dashboard');
+                }}
+                className="flex w-full items-center px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              >
+                <Home className="w-5 h-5 mr-3 text-muted-foreground" />
+                <span className="text-base font-medium">Dashboard</span>
+              </button>
+              
+              <button 
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  router.push('/profile');
+                }}
+                className="flex w-full items-center px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              >
+                <User className="w-5 h-5 mr-3 text-muted-foreground" />
+                <span className="text-base font-medium">Profile</span>
+              </button>
+              
+              <button 
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  router.push('/settings');
+                }}
+                className="flex w-full items-center px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              >
+                <Settings className="w-5 h-5 mr-3 text-muted-foreground" />
+                <span className="text-base font-medium">Settings</span>
+              </button>
             </div>
           </div>
         </div>
