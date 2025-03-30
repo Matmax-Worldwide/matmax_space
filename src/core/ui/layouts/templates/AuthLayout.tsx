@@ -107,47 +107,47 @@ export function AuthLayout({
         {/* Right side - Authentication form */}
         <div className={cn(
           "flex flex-col justify-center items-center relative z-10",
-          isMobile ? "w-full py-4" : "w-1/2",
+          isMobile ? "w-full py-2" : "w-1/2",
           isSmallMobile ? "px-4" : "px-8"
         )}>
           {/* Mobile logo - only shown on mobile */}
           {showLogo && (
-            <div className="md:hidden mb-6 flex flex-col items-center">
+            <div className="md:hidden mb-3 flex flex-col items-center">
               <Logo 
-                className={isSmallMobile ? "w-40 h-40" : "w-56 h-56"}
+                className={isSmallMobile ? "w-36 h-36" : "w-48 h-48"}
                 darkModeInvert={true}
                 size="auth"
                 lightBackground={false}
               />
               <h1 className={cn(
-                "font-bold mt-2 text-center text-white",
+                "font-bold mt-1 text-center text-white",
                 isSmallMobile ? "text-xl" : "text-2xl"
               )}>
                 MatMax Wellness Studio
               </h1>
-              <p className="text-md max-w-md text-white opacity-90 mt-1 text-center">
+              <p className="text-sm max-w-md text-white opacity-90 mt-0.5 mb-2 text-center">
                 welcome to our universe
               </p>
             </div>
           )}
           
           <div className={cn(
-            "w-full",
+            "w-full mt-0",
             isSmallMobile ? "max-w-[320px]" : "max-w-md",
             contentClassName
           )}>
             {/* Title and description */}
             {(title || description) && (
               <div className={cn(
-                "mb-4 text-center",
-                isSmallMobile && "mb-3"
+                "mb-2 text-center",
+                isSmallMobile && "mb-2"
               )}>
                 {title && <h2 className={cn(
                   "font-bold text-white",
                   isSmallMobile ? "text-lg" : "text-2xl"
                 )}>{title}</h2>}
                 {description && <p className={cn(
-                  "text-white mt-1 opacity-80",
+                  "text-white mt-0.5 opacity-80",
                   isSmallMobile ? "text-xs" : "text-sm"
                 )}>{description}</p>}
               </div>
@@ -156,7 +156,7 @@ export function AuthLayout({
             {/* Main content - authentication form */}
             <div className={cn(
               "bg-card/95 backdrop-blur-sm border border-border/50 rounded-lg shadow-lg",
-              isSmallMobile ? "p-3" : "p-6"
+              isSmallMobile ? "p-3" : "p-5"
             )}>
               {children}
             </div>
@@ -164,7 +164,7 @@ export function AuthLayout({
             {/* Footer */}
             {footer && (
               <div className={cn(
-                "mt-3 text-center text-white",
+                "mt-2 text-center text-white",
                 isSmallMobile ? "text-xs" : "text-sm"
               )}>
                 {footer}
@@ -695,28 +695,28 @@ export function AuthLayout({
               width: 120px;
               height: 120px;
               left: 50%;
-              top: 40%;
+              top: 30%;
             }
             
             .supernova-1 {
               transform-origin: center;
               transform: scale(0.7);
               left: 45%;
-              top: 28%;
+              top: 22%;
             }
             
             .supernova-2 {
               transform-origin: center;
               transform: scale(0.7);
               left: 53%;
-              top: 52%;
+              top: 45%;
             }
             
             .supernova-3 {
               transform-origin: center;
               transform: scale(0.7);
               left: 48%;
-              top: 17%;
+              top: 14%;
             }
             
             .galaxies {
@@ -774,6 +774,12 @@ export function AuthLayout({
               .aurora {
                 height: 200px;
               }
+            }
+            
+            /* Adjust layout for mobile to position content higher */
+            .flex.min-h-screen {
+              align-items: flex-start;
+              padding-top: 2vh; /* Add some space at the top */
             }
           }
         `}</style>
