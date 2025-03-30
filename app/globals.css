@@ -67,3 +67,36 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Header fixes for small screens */
+@media (max-width: 350px) {
+  /* Ultra-compact header for very small screens */
+  .header-ultra-compact {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  
+  /* Make header items even smaller */
+  .header-ultra-compact button {
+    transform: scale(0.9);
+    margin: 0 !important;
+  }
+  
+  /* Hide all text in buttons on ultra small screens */
+  .header-ultra-compact .text-only-larger {
+    display: none !important;
+  }
+}
+
+/* Add responsive utilities */
+@media (min-width: 370px) {
+  .hidden-xxs {
+    display: none !important;
+  }
+}
+
+@media (max-width: 369px) {
+  .hidden-larger {
+    display: none !important;
+  }
+}

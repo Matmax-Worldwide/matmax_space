@@ -4,7 +4,7 @@ import { ReactNode, useCallback, useState, useEffect, memo } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useLayout, ModuleType } from '../../providers/LayoutProvider';
 import { cn } from '@/src/core/utils/styling';
-import { ChevronDown, Menu, MoreHorizontal } from 'lucide-react';
+import { ChevronDown, Menu, MoreHorizontal, Wallet, Globe } from 'lucide-react';
 
 // Import the components we need
 import UserMenu from './UserMenu';
@@ -75,9 +75,11 @@ function Header({
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [subMenuOpen, setSubMenuOpen] = useState<string | null>(null);
+  const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
   
   // Determine if we're in mobile/tablet view
   const isMobileView = isMobile || isTablet;
+  const isExtraSmall = isSmallMobile || (typeof window !== 'undefined' && window.innerWidth < 400);
   
   // Navigation items for mobile dropdown with children - comprehensive module system
   const mobileNavItems: NavItemType[] = [
@@ -203,12 +205,19 @@ function Header({
     setSubMenuOpen(null); // Close any open submenu when toggling the main dropdown
   }, []);
   
-  // Close mobile nav when clicking outside
+  // Toggle actions menu
+  const toggleActionsMenu = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActionsMenuOpen(prev => !prev);
+  }, []);
+  
+  // Close menus when clicking outside
   useEffect(() => {
-    if (!mobileNavOpen) return;
+    if (!mobileNavOpen && !actionsMenuOpen) return;
     
     const handleClickOutside = () => {
-      setMobileNavOpen(false);
+      if (mobileNavOpen) setMobileNavOpen(false);
+      if (actionsMenuOpen) setActionsMenuOpen(false);
       setSubMenuOpen(null);
     };
     
@@ -221,11 +230,12 @@ function Header({
       clearTimeout(timeoutId);
       document.removeEventListener('click', handleClickOutside);
     };
-  }, [mobileNavOpen]);
+  }, [mobileNavOpen, actionsMenuOpen]);
   
   // Close mobile nav when navigating
   useEffect(() => {
     setMobileNavOpen(false);
+    setActionsMenuOpen(false);
     setSubMenuOpen(null);
   }, [pathname]);
   
@@ -316,113 +326,142 @@ function Header({
   
   return (
     <header className={cn(
-      "w-full h-16 flex items-center justify-between px-4 md:px-6 lg:px-8 overflow-hidden",
+      "w-full h-16 flex items-center justify-between px-2 sm:px-4 overflow-visible",
       sticky && "sticky top-0 z-40",
       transparent ? "bg-transparent" : "bg-background border-b border-border",
       className
     )}>
-      <div className="flex items-center">
-        {/* Mobile menu toggle - only shown on mobile/tablet */}
-        {showMobileMenu && layoutType === 'dashboard' && isMobileView && (
-          <button 
-            onClick={toggleSidebar}
-            className="mr-3 p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 touch-manipulation"
-            aria-label="Toggle sidebar menu"
-            style={{ touchAction: 'manipulation' }}
-          >
-            <Menu size={20} />
-          </button>
-        )}
-        
-        {/* Horizontal nav on desktop, empty space on mobile */}
-        {isMobileView ? (
-          <div className="flex-1">{/* No page title, just empty space */}</div>
-        ) : (
-          <HeaderNav />
-        )}
-      </div>
-      
-      {/* Right-side header elements */}
-      <div className="flex items-center justify-end space-x-2 md:space-x-3 overflow-hidden">
-        {/* Mobile navigation dropdown */}
-        {isMobileView && layoutType === 'dashboard' && (
-          <div className="relative h-10 flex items-center">
-            <button
-              onClick={toggleMobileNav}
-              className={cn(
-                "flex items-center justify-center px-2 sm:px-4 py-2 rounded-md text-white font-medium shadow-sm h-10 max-w-[120px] sm:max-w-none overflow-hidden",
-                "transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-primary/30",
-                "will-change-transform active:scale-95 touch-manipulation",
-                activeModule?.color?.replace('bg-', '') || 'bg-gradient-to-r from-blue-500 to-blue-600'
-              )}
-              aria-expanded={mobileNavOpen}
-              aria-haspopup="true"
-              aria-controls="mobile-module-menu"
-              aria-label="Navigation modules menu"
-              style={{ touchAction: 'manipulation' }}
+      <div className="container mx-auto flex items-center justify-between px-1 sm:px-2">
+        {/* Left Section */}
+        <div className="flex items-center">
+          {/* Mobile menu toggle - only shown on mobile/tablet */}
+          {showMobileMenu && layoutType === 'dashboard' && isMobileView && (
+            <button 
+              onClick={toggleSidebar}
+              className="mr-2 p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              aria-label="Toggle sidebar menu"
             >
-              {activeModule && (
-                <activeModule.icon className="w-4 h-4 mr-1 sm:mr-2 flex-shrink-0" />
-              )}
-              <span className="text-xs sm:text-sm mr-1 truncate">{activeModule?.title || 'MAIN'}</span>
-              <ChevronDown 
-                size={16} 
-                className={cn(
-                  "transition-transform duration-200 will-change-transform flex-shrink-0", 
-                  mobileNavOpen && "rotate-180"
-                )}
-              />
+              <Menu size={20} />
             </button>
-            
-            {/* Mobile navigation dropdown */}
-            {mobileNavOpen && (
-              <div 
-                id="mobile-module-menu"
-                className={cn(
-                  "absolute right-0 top-full mt-2 w-72 bg-white dark:bg-neutral-800 border border-border rounded-lg shadow-xl z-50 overflow-hidden",
-                  "animate-in fade-in-50 slide-in-from-top-5 duration-200",
-                  // Prevent dropdown from extending beyond viewport
-                  "max-h-[80vh]",
-                  // Position dropdown to stay in viewport
-                  isSmallMobile && "right-0 left-auto transform-none"
-                )}
-                style={{
-                  maxHeight: 'min(80vh, 500px)',
-                  overflowY: 'auto',
-                  // Ensure dropdown stays within screen boundaries
-                  ...(isLandscape ? { 
-                    maxHeight: 'min(70vh, 400px)',
-                    right: 0,
-                    left: 'auto'
-                  } : {})
-                }}
-                role="menu"
-              >
-                <div className="py-2 border-b border-border px-4 text-xs font-medium text-muted-foreground uppercase">
-                  Modules
-                </div>
-                <div className="overflow-y-auto divide-y divide-border/30">
-                  {renderMobileNavItems()}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-        
-        {/* Blockchain wallet connection */}
-        {showWalletConnect && layoutType !== 'auth' && (
-          <div className="h-10 flex items-center">
-            <BlockchainWallet />
-          </div>
-        )}
-        
-        {/* Language selector */}
-        <div className="h-10 flex items-center">
-          <LanguageSelector />
+          )}
+          
+          {/* Horizontal nav on desktop, empty space on mobile */}
+          {isMobileView ? (
+            <div className="flex-1">{/* No page title, just empty space */}</div>
+          ) : (
+            <HeaderNav />
+          )}
         </div>
         
-        {/* User menu */}
-        <div className="h-10 flex items-center">
+        {/* Right Section */}
+        <div className="flex items-center space-x-1 sm:space-x-2">
+          {/* Module Dropdown - Only on mobile */}
+          {isMobileView && layoutType === 'dashboard' && (
+            <div className="relative">
+              <button
+                onClick={toggleMobileNav}
+                className={cn(
+                  "flex items-center justify-center px-2 py-1.5 rounded-md text-white font-medium shadow-sm",
+                  "transition-all duration-200",
+                  activeModule?.color?.replace('bg-', '') || 'bg-gradient-to-r from-blue-500 to-blue-600'
+                )}
+                aria-expanded={mobileNavOpen}
+                aria-label="Navigation modules menu"
+              >
+                {activeModule && (
+                  <activeModule.icon className="w-4 h-4 mr-1.5" />
+                )}
+                <span className="text-xs sm:text-sm">{isExtraSmall ? activeModule?.title?.slice(0, 4) : activeModule?.title}</span>
+                <ChevronDown 
+                  size={14} 
+                  className={cn(
+                    "ml-1 transition-transform", 
+                    mobileNavOpen && "rotate-180"
+                  )}
+                />
+              </button>
+              
+              {/* Mobile navigation dropdown */}
+              {mobileNavOpen && (
+                <div 
+                  className="absolute right-0 top-full mt-1 w-56 sm:w-64 bg-white dark:bg-neutral-800 border border-border rounded-lg shadow-lg z-50 overflow-hidden"
+                  style={{
+                    maxHeight: '70vh',
+                    overflowY: 'auto',
+                  }}
+                >
+                  <div className="py-1.5 border-b border-border px-3 text-xs font-medium text-muted-foreground uppercase">
+                    Modules
+                  </div>
+                  <div className="overflow-y-auto divide-y divide-border/30">
+                    {renderMobileNavItems()}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Regular Buttons (shown when enough space) */}
+          {!isExtraSmall && (
+            <>
+              {/* Blockchain wallet connection */}
+              {showWalletConnect && layoutType !== 'auth' && (
+                <BlockchainWallet />
+              )}
+              
+              {/* Language selector */}
+              <LanguageSelector />
+            </>
+          )}
+          
+          {/* Actions Menu Button - Shown only on small screens */}
+          {isExtraSmall && layoutType !== 'auth' && (
+            <div className="relative">
+              <button
+                onClick={toggleActionsMenu}
+                className="p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                aria-label="More actions"
+                aria-expanded={actionsMenuOpen}
+              >
+                <MoreHorizontal size={20} />
+              </button>
+              
+              {/* Actions dropdown menu */}
+              {actionsMenuOpen && (
+                <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-neutral-800 border border-border rounded-lg shadow-lg z-50 overflow-hidden">
+                  <div className="py-1">
+                    {showWalletConnect && (
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActionsMenuOpen(false);
+                          // Open wallet connect dialog
+                        }}
+                        className="w-full flex items-center px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                      >
+                        <Wallet className="w-4 h-4 mr-3 text-muted-foreground" />
+                        <span>Connect Wallet</span>
+                      </button>
+                    )}
+                    
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActionsMenuOpen(false);
+                        // Open language selector
+                      }}
+                      className="w-full flex items-center px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                    >
+                      <Globe className="w-4 h-4 mr-3 text-muted-foreground" />
+                      <span>Change Language</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* User menu - Always visible */}
           <UserMenu />
         </div>
       </div>

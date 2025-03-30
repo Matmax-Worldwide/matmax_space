@@ -65,12 +65,15 @@ function DashboardLayout({
             ? "ml-0 md:ml-[280px]" 
             : "ml-0 md:ml-[70px]"),
         )}>
-          <div className="w-full max-w-[100vw] overflow-x-hidden">
-            {/* Mobile Header */}
-            <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+          {/* Main container with max-width for content centering */}
+          <div className="w-full max-w-screen overflow-hidden mx-auto">
+            {/* Header positioned in center of available space */}
+            <div className="max-w-7xl mx-auto w-full">
+              <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+            </div>
             
             {/* Main Content */}
-            <div className="flex-1 w-full max-w-full overflow-hidden">
+            <div className="flex-1 w-full overflow-hidden">
               <PageContainer 
                 className={contentClassName} 
                 maxWidth={maxWidth}

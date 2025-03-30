@@ -35,10 +35,11 @@ export function LanguageSelector() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-center h-8 w-8 rounded-full hover:bg-muted focus:outline-none"
+        className="flex items-center justify-center h-6 w-6 rounded-full hover:bg-muted focus:outline-none"
         aria-label="Select language"
+        title="Change language"
       >
-        <Globe className="h-5 w-5 text-muted-foreground" />
+        <Globe className="h-3 w-3 text-muted-foreground" />
       </button>
       
       {isOpen && (
