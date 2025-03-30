@@ -56,6 +56,7 @@ export default function UserMenu() {
         </div>
       </button>
       
+      {/* User menu dropdown - positioned in front of overlays */}
       {isOpen && (
         <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-card border border-border overflow-hidden z-50">
           <div className="p-2">

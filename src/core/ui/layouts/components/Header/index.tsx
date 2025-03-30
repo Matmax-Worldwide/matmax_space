@@ -326,7 +326,7 @@ function Header({
   
   return (
     <header className={cn(
-      "w-full h-16 bg-background border-b border-border overflow-visible",
+      "w-full h-16 bg-background border-b border-border",
       sticky && "sticky top-0 z-40",
       transparent && "bg-transparent border-none",
       className
@@ -353,11 +353,11 @@ function Header({
           )}
         </div>
         
-        {/* Right Section */}
+        {/* Right Section - fixed width to prevent movement */}
         <div className="flex items-center h-full space-x-2 sm:space-x-3">
           {/* Module Dropdown - Only on mobile */}
           {isMobileView && layoutType === 'dashboard' && (
-            <div className="relative h-full flex items-center">
+            <div className="h-full flex items-center relative">
               <button
                 onClick={toggleMobileNav}
                 className={cn(
@@ -406,13 +406,13 @@ function Header({
             <>
               {/* Blockchain wallet connection */}
               {showWalletConnect && layoutType !== 'auth' && (
-                <div className="h-full flex items-center">
+                <div className="h-full flex items-center z-10">
                   <BlockchainWallet />
                 </div>
               )}
               
               {/* Language selector */}
-              <div className="h-full flex items-center">
+              <div className="h-full flex items-center z-20">
                 <LanguageSelector />
               </div>
             </>
@@ -420,7 +420,7 @@ function Header({
           
           {/* Actions Menu Button - Shown only on small screens */}
           {isExtraSmall && layoutType !== 'auth' && (
-            <div className="relative h-full flex items-center">
+            <div className="h-full flex items-center relative z-30">
               <button
                 onClick={toggleActionsMenu}
                 className="flex items-center justify-center p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 h-8 w-8"
@@ -466,11 +466,23 @@ function Header({
           )}
           
           {/* User menu - Always visible */}
-          <div className="h-full flex items-center">
+          <div className="h-full flex items-center z-40">
             <UserMenu />
           </div>
         </div>
       </div>
+
+      {/* Global overlay for open menus - prevents layout shifts */}
+      {(mobileNavOpen || actionsMenuOpen) && (
+        <div 
+          className="fixed inset-0 bg-transparent z-30" 
+          onClick={() => {
+            setMobileNavOpen(false);
+            setActionsMenuOpen(false);
+          }}
+          aria-hidden="true"
+        />
+      )}
     </header>
   );
 }

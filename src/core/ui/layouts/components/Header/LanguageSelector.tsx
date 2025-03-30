@@ -44,13 +44,7 @@ export function LanguageSelector() {
       
       {isOpen && (
         <>
-          {/* Dropdown backdrop - closes dropdown when clicked */}
-          <div 
-            className="fixed inset-0 z-20"
-            onClick={() => setIsOpen(false)}
-          />
-          
-          {/* Language dropdown */}
+          {/* Language dropdown - separate from backdrop */}
           <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-md shadow-lg z-30 py-1">
             {LANGUAGES.map((language) => {
               const isActive = language.code === currentLanguage;
