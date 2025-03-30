@@ -41,6 +41,9 @@ function DashboardLayout({
       route 
     } = useLayout();
     
+    // Get sidebar width values for proper header alignment
+    const sidebarWidth = isMobile ? 0 : (isSidebarOpen ? 280 : 70);
+    
     return (
       <div className="flex w-full overflow-x-hidden">
         {/* Sidebar component (hidden on small devices when collapsed) */}
@@ -65,8 +68,12 @@ function DashboardLayout({
             ? "ml-0 md:ml-[280px]" 
             : "ml-0 md:ml-[70px]"),
         )}>
-          {/* Full-width header */}
-          <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+          {/* Full-width header with sidebar width passed as prop */}
+          <Header 
+            toggleSidebar={toggleSidebar} 
+            isSidebarOpen={isSidebarOpen} 
+            sidebarWidth={sidebarWidth}
+          />
             
           {/* Main Content */}
           <div className="flex-1 w-full overflow-hidden">

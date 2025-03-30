@@ -33,6 +33,7 @@ type HeaderProps = {
   showWalletConnect?: boolean;
   toggleSidebar?: () => void;
   isSidebarOpen?: boolean;
+  sidebarWidth?: number;
 };
 
 // Navigation item type definition (simplified from HeaderNav)
@@ -69,6 +70,7 @@ function Header({
   showWalletConnect = true,
   toggleSidebar,
   isSidebarOpen,
+  sidebarWidth = 0
 }: HeaderProps) {
   const router = useRouter();
   const { isMobile, isTablet, isSmallMobile, isLandscape, layoutType, currentModule, setCurrentModule } = useLayout();
@@ -336,14 +338,17 @@ function Header({
   
   return (
     <header className="w-full h-16 bg-background border-b border-border sticky top-0 z-[100]">
-      <div className="w-full h-full flex items-center px-3 md:px-4 relative">
-        {/* Left Section */}
-        <div className="flex items-center h-full flex-shrink overflow-hidden">
+      <div className="w-full h-full flex items-center relative">
+        {/* Left Section - with proper spacing to align with sidebar */}
+        <div className={cn(
+          "flex items-center h-full",
+          isMobile ? "pl-4" : sidebarWidth ? `pl-4 md:pl-[${sidebarWidth + 16}px]` : "pl-4"
+        )}>
           {/* Mobile menu toggle - only shown on mobile/tablet */}
           {showMobileMenu && layoutType === 'dashboard' && isMobileView && (
             <button 
               onClick={toggleSidebar}
-              className="mr-2 p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 flex items-center justify-center flex-shrink-0"
+              className="mr-3 p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 flex items-center justify-center flex-shrink-0"
               aria-label="Toggle sidebar menu"
             >
               <Menu size={20} />
@@ -354,14 +359,14 @@ function Header({
           {isMobileView ? (
             <div className="flex-1">{/* No page title, just empty space */}</div>
           ) : (
-            <div className="overflow-hidden max-w-[500px]">
+            <div className="overflow-hidden">
               <HeaderNav />
             </div>
           )}
         </div>
         
-        {/* Right Section - using ml-auto to push to the right */}
-        <div className="flex items-center h-full space-x-3 ml-auto flex-shrink-0">
+        {/* Right Section - fixed positioning with proper padding */}
+        <div className="flex items-center h-full space-x-3 absolute right-4">
           {/* Module Dropdown - Only on mobile */}
           {isMobileView && layoutType === 'dashboard' && (
             <div className="h-full flex items-center">
@@ -393,7 +398,7 @@ function Header({
                 <div className="h-full flex items-center">
                   <button
                     onClick={() => setOpen({ ...open, wallet: !open.wallet, language: false, user: false })}
-                    className="flex items-center px-3 py-1.5 rounded-full bg-gradient-to-r from-blue-400 to-blue-500 text-white text-xs h-8 shadow-sm flex-shrink-0"
+                    className="flex items-center px-3 py-1.5 rounded-full bg-gradient-to-r from-blue-400 to-blue-500 text-white text-xs h-8 shadow-sm flex-shrink-0 hover:shadow-md transition-shadow"
                     title="Connect Wallet"
                     aria-label="Connect blockchain wallet"
                   >
@@ -436,11 +441,11 @@ function Header({
           <div className="h-full flex items-center flex-shrink-0">
             <button 
               onClick={() => setOpen({ ...open, user: !open.user, wallet: false, language: false })}
-              className="h-8 w-8 flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 text-white shadow-sm"
+              className="h-8 w-8 flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 text-white shadow-sm hover:shadow-md transition-shadow"
               aria-label="User menu"
               title="Account menu"
             >
-              <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs">
+              <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium">
                 U
               </div>
             </button>
