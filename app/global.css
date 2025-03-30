@@ -1,3 +1,10 @@
+@viewport {
+  width: device-width;
+  initial-scale: 1;
+  maximum-scale: 1;
+  user-scalable: no;
+}
+
 /* Add these global styles to fix mobile scaling issues */
 html, body {
   width: 100%;
@@ -34,6 +41,24 @@ div[class*="dashboard"] {
   @supports (-webkit-touch-callout: none) {
     .min-h-screen {
       min-height: -webkit-fill-available;
+    }
+    
+    body {
+      width: 100%;
+      min-width: 100%;
+      max-width: 100%;
+    }
+    
+    /* Specific to iPhone 14 */
+    @media only screen 
+    and (device-width: 390px) 
+    and (device-height: 844px) 
+    and (-webkit-device-pixel-ratio: 3) {
+      body, html, #__next, main {
+        width: 100vw;
+        max-width: 100vw;
+        overflow-x: hidden;
+      }
     }
   }
 }

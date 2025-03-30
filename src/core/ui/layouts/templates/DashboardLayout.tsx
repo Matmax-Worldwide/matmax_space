@@ -23,7 +23,7 @@ type DashboardLayoutProps = {
  * Main layout for authenticated sections of the application
  * Optimized for mobile with responsive layout adaptations and performance enhancements
  */
-export function DashboardLayout({ children }: { children: ReactNode }) {
+function DashboardLayout({ children }: { children: ReactNode }) {
   const DashboardContent = () => {
     const { 
       isMobile, 
@@ -85,8 +85,5 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
   );
 }
 
-// Use memo for performance optimization
-export default memo(DashboardLayout);
-
-// Also export as named component
-export { DashboardLayout }; 
+// Export as default and memo for performance optimization
+export default memo(DashboardLayout); 

@@ -1,6 +1,6 @@
 "use client";
 
-import { DashboardLayout } from '../../src/core/ui/layouts/templates/DashboardLayout';
+import DashboardLayout from '../../src/core/ui/layouts/templates/DashboardLayout';
 
 export default function DashboardPage() {
   return (

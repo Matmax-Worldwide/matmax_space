@@ -1,4 +1,4 @@
-import { DashboardLayout } from '@/src/core/ui/layouts/templates/DashboardLayout';
+import DashboardLayout from '@/src/core/ui/layouts/templates/DashboardLayout';
 import { 
   BarChart3, 
   TrendingUp, 

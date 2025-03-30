@@ -3,7 +3,7 @@
 import { createClient } from "@/utils/supabase/client";
 import { InfoIcon, UserIcon } from "lucide-react";
 import { redirect } from "next/navigation";
-import { DashboardLayout } from "@/src/core/ui/layouts/templates/DashboardLayout";
+import DashboardLayout from "@/src/core/ui/layouts/templates/DashboardLayout";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 

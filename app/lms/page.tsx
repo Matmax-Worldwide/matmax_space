@@ -1,4 +1,4 @@
-import { DashboardLayout } from '@/src/core/ui/layouts/templates/DashboardLayout';
+import DashboardLayout from '@/src/core/ui/layouts/templates/DashboardLayout';
 import { BarChart3, BookOpen, GraduationCap, LayoutGrid, Users } from 'lucide-react';
 
 export default function LmsPage() {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { DashboardLayout } from '../../../src/core/ui/layouts/templates/DashboardLayout';
+import DashboardLayout from '../../../src/core/ui/layouts/templates/DashboardLayout';
 
 // Mock country data
 const MOCK_COUNTRIES = [

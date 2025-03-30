@@ -114,11 +114,6 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const route = usePathname() || '/';
   
-  // Function to toggle sidebar
-  const toggleSidebar = useCallback(() => {
-    setIsSidebarOpen(prev => !prev);
-  }, []);
-  
   // Effect to detect current module from URL path
   useEffect(() => {
     if (typeof window === 'undefined') return;
