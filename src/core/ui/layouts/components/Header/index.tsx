@@ -327,16 +327,7 @@ function Header({
       <div className="w-full grid grid-cols-3 items-center">
         {/* Left side - Logo and toggle */}
         <div className="flex items-center gap-2">
-          {isMobileView && showMobileMenu && (
-            <button 
-              onClick={toggleSidebar}
-              className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors" 
-              aria-label="Toggle menu"
-              data-menu="toggle"
-            >
-              <Menu className="h-5 w-5 text-muted-foreground" />
-            </button>
-          )}
+          {/* Hamburger menu moved to the right side, so only logo here now */}
           <Logo size="default" darkModeInvert={true} />
         </div>
         
@@ -350,7 +341,20 @@ function Header({
           {/* Mobile actions only shown on mobile */}
           {isMobileView && (
             <>
-              {/* Account settings button for mobile - moved to be next to module switcher */}
+              {/* Hamburger menu button - moved from left to right side */}
+              {showMobileMenu && (
+                <button 
+                  onClick={toggleSidebar}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                  aria-label="Toggle sidebar"
+                  data-menu="toggle"
+                >
+                  <Menu className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-sm font-medium">Menu</span>
+                </button>
+              )}
+              
+              {/* Account settings button for mobile */}
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
