@@ -336,9 +336,9 @@ function Header({
   
   return (
     <header className="w-full h-16 bg-background border-b border-border sticky top-0 z-40">
-      <div className="w-full h-full flex items-center justify-between px-3 md:px-4 relative">
-        {/* Left Section */}
-        <div className="flex items-center h-full">
+      <div className="w-full h-full flex items-center px-3 md:px-4 relative">
+        {/* Left Section - limit width to prevent pushing right elements offscreen */}
+        <div className="flex items-center h-full max-w-[60%] mr-auto">
           {/* Mobile menu toggle - only shown on mobile/tablet */}
           {showMobileMenu && layoutType === 'dashboard' && isMobileView && (
             <button 
@@ -354,12 +354,14 @@ function Header({
           {isMobileView ? (
             <div className="flex-1">{/* No page title, just empty space */}</div>
           ) : (
-            <HeaderNav />
+            <div className="overflow-hidden">
+              <HeaderNav />
+            </div>
           )}
         </div>
         
-        {/* Right Section - fixed width to prevent movement */}
-        <div className="flex items-center h-full space-x-2 min-w-[120px] justify-end">
+        {/* Right Section - ensure minimum width and proper spacing */}
+        <div className="flex items-center h-full gap-2 min-w-[150px] justify-end ml-4">
           {/* Module Dropdown - Only on mobile */}
           {isMobileView && layoutType === 'dashboard' && (
             <div className="h-full flex items-center">

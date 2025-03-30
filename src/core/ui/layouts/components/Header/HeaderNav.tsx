@@ -325,108 +325,24 @@ export function HeaderNav() {
   
   // Render desktop navigation
   const renderDesktopNav = () => (
-    <ul className="flex items-center space-x-2">
-      {navItems.filter(hasPermission).map((item) => {
-        const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
-        const isOpen = openDropdown === item.title;
-        // Use toLowerCase() for consistent case comparison
-        const isActiveSection = activeSection.toLowerCase() === item.title.toLowerCase();
-        // Determine if this item should be highlighted based on active section
-        const shouldHighlight = isActiveSection;
-        
-        return (
-          <li key={item.href} className="relative">
-            {item.children ? (
-              <>
-                {/* Menu item with dropdown */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleDropdown(item.title);
-                    // Also trigger navigation to open the sidebar and set the active section
-                    handleNavigation(item.href, true, item.title.toLowerCase());
-                  }}
-                  className={cn(
-                    "flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-all shadow-sm hover:shadow",
-                    {
-                      // Highlighted state based on active section
-                      "bg-gradient-to-r text-white": shouldHighlight,
-                      [item.color || ""]: shouldHighlight,
-                      
-                      // Active section or active state
-                      "bg-primary/10 text-primary border-b-2 border-primary": (isActive) && !shouldHighlight,
-                      
-                      // Normal state
-                      "bg-white dark:bg-neutral-800 text-foreground hover:bg-gray-100 dark:hover:bg-neutral-700": !isActive && !shouldHighlight,
-                      
-                      // Opened dropdown indicator
-                      "ring-2 ring-primary/20": isOpen && !shouldHighlight
-                    }
-                  )}
-                  aria-expanded={isOpen}
-                  aria-controls={`dropdown-${item.title}`}
-                >
-                  <item.icon className="h-4 w-4 mr-1.5 flex-shrink-0" />
-                  <span>{item.title}</span>
-                  <ChevronDown
-                    size={14}
-                    className={cn("ml-1.5 transition-transform", isOpen ? "rotate-180" : "")}
-                  />
-                </button>
-                
-                {/* Dropdown menu */}
-                {isOpen && (
-                  <div
-                    id={`dropdown-${item.title}`}
-                    className="absolute top-full left-0 mt-1 w-48 rounded-md bg-white dark:bg-neutral-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby={`dropdown-button-${item.title}`}
-                  >
-                    <div className="py-1 divide-y divide-gray-100 dark:divide-neutral-700">
-                      {item.children.map((child) => (
-                        <Link
-                          key={child.href}
-                          href={child.href}
-                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700"
-                          onClick={() => handleNavigation(child.href, false, item.title.toLowerCase())}
-                          role="menuitem"
-                        >
-                          {child.title}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </>
-            ) : (
-              /* Regular menu item without dropdown */
-              <Link
-                href={item.href}
-                onClick={() => handleNavigation(item.href, false, item.title.toLowerCase())}
-                className={cn(
-                  "flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-all shadow-sm hover:shadow",
-                  {
-                    // Highlighted state based on active section
-                    "bg-gradient-to-r text-white": shouldHighlight,
-                    [item.color || ""]: shouldHighlight,
-                    
-                    // Active section or active state
-                    "bg-primary/10 text-primary border-b-2 border-primary": (isActive) && !shouldHighlight,
-                    
-                    // Normal state
-                    "bg-white dark:bg-neutral-800 text-foreground hover:bg-gray-100 dark:hover:bg-neutral-700": !isActive && !shouldHighlight
-                  }
-                )}
-              >
-                <item.icon className="h-4 w-4 mr-1.5 flex-shrink-0" />
-                <span>{item.title}</span>
-              </Link>
-            )}
+    <nav className="mx-4 max-w-full overflow-hidden">
+      <ul className="flex gap-6 overflow-hidden">
+        {navItems.filter(hasPermission).map((item) => (
+          <li key={item.href} className="relative whitespace-nowrap">
+            <Link 
+              href={item.href} 
+              className={cn(
+                "flex items-center h-16 border-b-2 text-sm transition-colors duration-150 hover:text-primary",
+                pathname.startsWith(item.href) ? "border-primary text-primary" : "border-transparent text-muted-foreground"
+              )}
+            >
+              <item.icon className="w-4 h-4 mr-2" />
+              <span>{item.title}</span>
+            </Link>
           </li>
-        );
-      })}
-    </ul>
+        ))}
+      </ul>
+    </nav>
   );
   
   return (
