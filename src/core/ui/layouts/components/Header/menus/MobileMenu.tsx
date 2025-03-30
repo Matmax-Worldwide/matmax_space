@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Book, LucideIcon, School, ShoppingBag, BarChart3, CreditCard, Settings, Bell, LogOut } from 'lucide-react';
+import { Book, LucideIcon, School, ShoppingBag, BarChart3, CreditCard, Settings, Bell, LogOut, User } from 'lucide-react';
 import { useLayout } from '../../../providers/LayoutProvider';
 import { cn } from '@/src/core/utils/styling';
 
@@ -192,12 +192,8 @@ export function MobileMenu({
         {/* User Profile */}
         <div className="p-4 border-b border-neutral-200 dark:border-neutral-700">
           <div className="flex items-center">
-            <div className="w-12 h-12 rounded-full overflow-hidden mr-3 transform transition-transform duration-300 hover:scale-105">
-              <img 
-                src={userProfile.avatar || "/images/default-avatar.jpg"}
-                alt={userProfile.name}
-                className="w-full h-full object-cover"
-              />
+            <div className="w-12 h-12 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center mr-3 transform transition-transform duration-300 hover:scale-105">
+              <User className="h-6 w-6 text-neutral-500 dark:text-neutral-400" />
             </div>
             <div>
               <h3 className="font-medium">{userProfile.name}</h3>
@@ -208,55 +204,8 @@ export function MobileMenu({
         
         {/* Menu Content - Scrollable */}
         <div className="flex-1 overflow-y-auto">
-          {/* Modules Selection */}
-          <div className="p-4">
-            <p className="text-xs uppercase font-semibold text-muted-foreground mb-3 pl-2">Switch Module</p>
-            <div className="space-y-3">
-              {SECTIONS.map((section, index) => {
-                const SectionIcon = section.icon;
-                const isActive = section.id.toLowerCase() === currentSectionId?.toLowerCase();
-                
-                return (
-                  <button
-                    key={section.id}
-                    onClick={() => handleSectionClick(section.id)}
-                    className={cn(
-                      "flex items-center w-full p-3 rounded-lg border transition-all duration-200",
-                      isActive
-                        ? "bg-neutral-100 dark:bg-neutral-800 border-primary"
-                        : "border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800/70"
-                    )}
-                    style={{
-                      transitionDelay: `${index * 50}ms`,
-                      opacity: mobileMenuVisible ? 1 : 0,
-                      transform: mobileMenuVisible ? 'translateX(0)' : 'translateX(20px)'
-                    }}
-                  >
-                    <div className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br mr-3 transition-transform duration-300 hover:scale-110",
-                      section.color
-                    )}>
-                      <SectionIcon className="h-5 w-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className={cn(
-                        "font-medium transition-colors duration-200",
-                        isActive ? section.textColor : ""
-                      )}>
-                        {section.title}
-                      </h3>
-                      <p className="text-xs text-muted-foreground">
-                        {section.description}
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-          
           {/* Module-specific options */}
-          <div className="p-4 pt-0">
+          <div className="p-4">
             <p className="text-xs uppercase font-semibold text-muted-foreground mb-3 pl-2">{currentSectionData.title} Options</p>
             <div className="space-y-2">
               {currentSectionId === 'main' && (
