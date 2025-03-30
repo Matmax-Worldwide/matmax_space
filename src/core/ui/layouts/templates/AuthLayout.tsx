@@ -112,20 +112,20 @@ export function AuthLayout({
         )}>
           {/* Mobile logo - only shown on mobile */}
           {showLogo && (
-            <div className="md:hidden mb-3 flex flex-col items-center">
+            <div className="md:hidden mb-1 flex flex-col items-center">
               <Logo 
-                className={isSmallMobile ? "w-36 h-36" : "w-48 h-48"}
+                className={isSmallMobile ? "w-32 h-32" : "w-40 h-40"}
                 darkModeInvert={true}
                 size="auth"
                 lightBackground={false}
               />
               <h1 className={cn(
-                "font-bold mt-1 text-center text-white",
-                isSmallMobile ? "text-xl" : "text-2xl"
+                "font-bold mt-0 text-center text-white",
+                isSmallMobile ? "text-lg" : "text-xl"
               )}>
                 MatMax Wellness Studio
               </h1>
-              <p className="text-sm max-w-md text-white opacity-90 mt-0.5 mb-2 text-center">
+              <p className="text-sm max-w-md text-white opacity-90 mt-0 mb-1 text-center">
                 welcome to our universe
               </p>
             </div>
@@ -779,7 +779,23 @@ export function AuthLayout({
             /* Adjust layout for mobile to position content higher */
             .flex.min-h-screen {
               align-items: flex-start;
-              padding-top: 2vh; /* Add some space at the top */
+              padding-top: 1vh;
+            }
+            
+            /* Additional adjustments for compact layout */
+            @media (max-height: 700px) {
+              .spiral-galaxy {
+                width: 90px;
+                height: 90px;
+              }
+              
+              .supernova-1, .supernova-2, .supernova-3 {
+                transform: scale(0.5);
+              }
+              
+              .aurora {
+                height: 150px;
+              }
             }
           }
         `}</style>
