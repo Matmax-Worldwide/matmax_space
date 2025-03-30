@@ -7,6 +7,7 @@ type LogoProps = {
   alt?: string;
   darkModeInvert?: boolean;
   size?: 'default' | 'large' | 'auth';
+  lightBackground?: boolean; // Whether displaying on light background
 };
 
 /**
@@ -21,7 +22,8 @@ export function Logo({
   className, 
   alt = "MatMax Wellness Studio", 
   darkModeInvert = true,  // Default to true for consistent dark mode behavior
-  size = 'default'        // Default to original size
+  size = 'default',       // Default to original size
+  lightBackground = true  // Default to light background (will invert in dark mode)
 }: LogoProps) {
   const { theme } = useLayout();
   
@@ -41,7 +43,10 @@ export function Logo({
         height={dimensions.height} 
         className={cn(
           "object-contain",
-          darkModeInvert ? "dark:invert" : "" // Only invert in dark mode
+          // Only invert in dark mode if on light background
+          lightBackground && darkModeInvert ? "dark:invert" : "", 
+          // Always invert if on dark background regardless of theme
+          !lightBackground ? "invert" : ""
         )}
         priority
       />
