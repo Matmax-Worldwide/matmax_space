@@ -66,9 +66,9 @@ function Header({
   sticky = true,
   showWalletConnect = true,
 }: HeaderProps) {
+  const router = useRouter();
   const { toggleSidebar, isMobile, isTablet, isSmallMobile, isLandscape, layoutType, currentModule, setCurrentModule } = useLayout();
   const pathname = usePathname();
-  const router = useRouter();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [subMenuOpen, setSubMenuOpen] = useState<string | null>(null);
   
@@ -244,6 +244,7 @@ function Header({
               e.stopPropagation();
               if (hasChildren) {
                 toggleSubMenu(item.title);
+                router.push(item.href);
               } else {
                 handleModuleChange(item.module, item.href);
               }

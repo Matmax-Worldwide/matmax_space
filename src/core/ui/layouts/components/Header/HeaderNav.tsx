@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/src/core/utils/styling';
 import { 
   Home,
@@ -59,6 +59,7 @@ type NavItemType = {
  */
 export function HeaderNav() {
   const pathname = usePathname();
+  const router = useRouter();
   const { setSidebarOpen, isMobile, isSmallMobile, isTablet, setActiveSection, activeSection } = useLayout();
   
   // Track opened dropdown
@@ -181,14 +182,18 @@ export function HeaderNav() {
     
     // On mobile with children, keep the menu open to show contextual items
     if (isMobile && hasChildren) {
-      // Keep mobile menu open and don't navigate
+      // Navigate to the main module page even on mobile
+      router.push(href);
       return;
     }
     
     // Close mobile menu only when actually navigating
     if (!hasChildren) {
       setMobileMenuOpen(false);
-      window.location.href = href;
+      router.push(href);
+    } else {
+      // Navigate to the main module page even when it has children
+      router.push(href);
     }
   };
   
