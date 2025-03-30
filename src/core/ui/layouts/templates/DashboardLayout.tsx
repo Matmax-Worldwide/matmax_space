@@ -1,3 +1,5 @@
+"use client";
+
 import { ReactNode, memo } from 'react';
 import { LayoutProvider } from '../providers/LayoutProvider';
 import Header from '../components/Header';

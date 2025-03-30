@@ -1,3 +1,5 @@
+"use client";
+
 import { ReactNode, useCallback, useState, useEffect, memo } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useLayout, ModuleType } from '../../providers/LayoutProvider';

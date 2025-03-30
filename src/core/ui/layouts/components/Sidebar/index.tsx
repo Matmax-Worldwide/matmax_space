@@ -1,3 +1,5 @@
+"use client";
+
 import { ReactNode, useEffect, useRef, useState } from 'react';
 import { useLayout } from '../../providers/LayoutProvider';
 import { cn } from '@/src/core/utils/styling';
