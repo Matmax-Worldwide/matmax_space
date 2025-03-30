@@ -5,6 +5,7 @@ import { FormMessage, Message } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 import Link from "next/link";
 import { AuthLayout } from "@/src/core/ui/layouts/templates/AuthLayout";
 import { useSearchParams } from "next/navigation";
@@ -27,7 +28,10 @@ function SignInForm() {
 
   return (
     <form className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold mb-4 text-center">Sign In</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold text-center">Sign In</h1>
+        <ThemeSwitcher />
+      </div>
       
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
@@ -72,7 +76,10 @@ function SignInForm() {
 function SignInFormLoading() {
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold mb-4 text-center">Sign In</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold text-center">Sign In</h1>
+        <div className="w-8 h-8"></div> {/* Placeholder for ThemeSwitcher */}
+      </div>
       <div className="animate-pulse space-y-4">
         <div className="h-10 bg-gray-200 rounded"></div>
         <div className="h-10 bg-gray-200 rounded"></div>
@@ -84,7 +91,7 @@ function SignInFormLoading() {
 
 export default function Login() {
   return (
-    <AuthLayout showLogo={false} contentClassName="mt-0">
+    <AuthLayout showLogo={true} contentClassName="mt-0">
       <Suspense fallback={<SignInFormLoading />}>
         <SignInForm />
       </Suspense>

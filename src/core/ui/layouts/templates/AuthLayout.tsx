@@ -43,7 +43,7 @@ export function AuthLayout({
             <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${imageUrl})` }}>
               <div className="absolute inset-0 bg-black/20" />
               <div className="relative z-10 h-full flex flex-col items-center justify-center text-white p-10">
-                <Logo className="w-16 h-16 mb-4" darkModeInvert={true} />
+                <Logo className="w-24 h-24 mb-4" darkModeInvert={true} />
                 <h1 className="text-3xl font-bold mb-2">MatMax Wellness Studio</h1>
                 <p className="text-lg max-w-md text-center opacity-90">
                   Your journey to wellness and balance begins here
@@ -52,7 +52,7 @@ export function AuthLayout({
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center p-10 text-center">
-              <Logo className="w-16 h-16 mb-4" darkModeInvert={true} />
+              <Logo className="w-24 h-24 mb-4" darkModeInvert={true} />
               <h1 className="text-3xl font-bold mb-2">MatMax Wellness Studio</h1>
               <p className="text-lg max-w-md opacity-80">
                 Your journey to wellness and balance begins here
@@ -68,18 +68,20 @@ export function AuthLayout({
           isSmallMobile ? "px-4" : "px-8"
         )}>
           {/* Mobile logo - only shown on mobile */}
-          <div className="md:hidden mb-6 flex flex-col items-center">
-            <Logo 
-              className={isSmallMobile ? "w-14 h-14" : "w-16 h-16"} 
-              darkModeInvert={true} 
-            />
-            <h1 className={cn(
-              "font-bold mt-4 text-center",
-              isSmallMobile ? "text-lg" : "text-xl"
-            )}>
-              MatMax Wellness Studio
-            </h1>
-          </div>
+          {showLogo && (
+            <div className="md:hidden mb-6 flex flex-col items-center">
+              <Logo 
+                className={isSmallMobile ? "w-20 h-20" : "w-24 h-24"} 
+                darkModeInvert={true} 
+              />
+              <h1 className={cn(
+                "font-bold mt-4 text-center",
+                isSmallMobile ? "text-lg" : "text-xl"
+              )}>
+                MatMax Wellness Studio
+              </h1>
+            </div>
+          )}
           
           <div className={cn(
             "w-full",
