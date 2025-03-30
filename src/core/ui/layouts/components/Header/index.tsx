@@ -341,7 +341,7 @@ function Header({
           {/* Mobile actions only shown on mobile */}
           {isMobileView && (
             <>
-              {/* Hamburger menu button - moved from left to right side */}
+              {/* Hamburger menu button */}
               {showMobileMenu && (
                 <button 
                   onClick={toggleSidebar}
@@ -353,21 +353,6 @@ function Header({
                   <span className="text-sm font-medium">Menu</span>
                 </button>
               )}
-              
-              {/* Account settings button for mobile */}
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  setSettingsMenuOpen(true);
-                }}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-                aria-label="Manage account settings"
-                data-action="manage-account-mobile"
-              >
-                <Settings className="h-5 w-5 text-muted-foreground" />
-                <span className="text-sm font-medium">Account</span>
-              </button>
               
               {/* Module switcher button for mobile */}
               <button 
@@ -390,6 +375,20 @@ function Header({
                   "text-sm font-medium",
                   currentSectionData.color.replace('from-', 'text-').split(' ')[0]
                 )}>{currentSectionData.title}</span>
+              </button>
+              
+              {/* Account settings button (icon only) for mobile - rightmost position */}
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  setSettingsMenuOpen(true);
+                }}
+                className="flex h-9 w-9 items-center justify-center rounded-md border border-border hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                aria-label="Manage account settings"
+                data-action="manage-account-mobile"
+              >
+                <Settings className="h-5 w-5 text-muted-foreground" />
               </button>
             </>
           )}
