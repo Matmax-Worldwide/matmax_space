@@ -55,50 +55,6 @@ export default function UserMenu() {
           {userEmail ? userEmail.charAt(0).toUpperCase() : 'U'}
         </div>
       </button>
-      
-      {/* User menu dropdown - positioned in front of overlays */}
-      {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-card border border-border overflow-hidden z-50">
-          <div className="p-2">
-            <div className="px-4 py-2 text-sm border-b border-border">
-              <p className="font-medium">Account</p>
-              <p className="text-muted-foreground truncate">{userEmail || 'User'}</p>
-            </div>
-            
-            <div className="mt-2">
-              <button 
-                className="w-full flex items-center px-4 py-2 text-sm hover:bg-muted rounded-md"
-                onClick={() => {
-                  setIsOpen(false);
-                  // Navigate to profile page when available
-                }}
-              >
-                <User size={16} className="mr-2" />
-                Profile
-              </button>
-              
-              <button 
-                className="w-full flex items-center px-4 py-2 text-sm hover:bg-muted rounded-md"
-                onClick={() => {
-                  setIsOpen(false);
-                  // Navigate to settings page when available
-                }}
-              >
-                <Settings size={16} className="mr-2" />
-                Settings
-              </button>
-              
-              <button 
-                className="w-full flex items-center px-4 py-2 text-sm hover:bg-muted rounded-md text-error"
-                onClick={handleSignOut}
-              >
-                <LogOut size={16} className="mr-2" />
-                Sign out
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 } 

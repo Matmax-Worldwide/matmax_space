@@ -4,7 +4,7 @@ import { ReactNode, useCallback, useState, useEffect, memo } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useLayout, ModuleType } from '../../providers/LayoutProvider';
 import { cn } from '@/src/core/utils/styling';
-import { ChevronDown, Menu, MoreHorizontal, Wallet, Globe } from 'lucide-react';
+import { ChevronDown, Menu, MoreHorizontal, Wallet, Globe, Check, ExternalLink, AlertCircle, User, Settings, LogOut } from 'lucide-react';
 
 // Import the components we need
 import UserMenu from './UserMenu';
@@ -76,6 +76,7 @@ function Header({
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [subMenuOpen, setSubMenuOpen] = useState<string | null>(null);
   const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
+  const [open, setOpen] = useState({ language: false, wallet: false, user: false });
   
   // Determine if we're in mobile/tablet view
   const isMobileView = isMobile || isTablet;
@@ -177,6 +178,15 @@ function Header({
       isHighlighted: currentModule === 'support',
       module: 'support'
     },
+  ];
+  
+  // Import from LanguageSelector component
+  const LANGUAGES = [
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'es', name: 'Español', flag: '🇪🇸' },
+    { code: 'fr', name: 'Français', flag: '🇫🇷' },
+    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+    { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
   ];
   
   // Handle module change
@@ -325,13 +335,8 @@ function Header({
   const activeModule = getCurrentModule();
   
   return (
-    <header className={cn(
-      "w-full h-16 bg-background border-b border-border",
-      sticky && "sticky top-0 z-40",
-      transparent && "bg-transparent border-none",
-      className
-    )}>
-      <div className="max-w-7xl mx-auto px-4 w-full h-full flex items-center justify-between">
+    <header className="w-full h-16 bg-background border-b border-border sticky top-0 z-40">
+      <div className="w-full h-full flex items-center justify-between px-3 md:px-4 relative">
         {/* Left Section */}
         <div className="flex items-center h-full">
           {/* Mobile menu toggle - only shown on mobile/tablet */}
@@ -354,50 +359,26 @@ function Header({
         </div>
         
         {/* Right Section - fixed width to prevent movement */}
-        <div className="flex items-center h-full space-x-2 sm:space-x-3">
+        <div className="flex items-center h-full space-x-2 min-w-[120px] justify-end">
           {/* Module Dropdown - Only on mobile */}
           {isMobileView && layoutType === 'dashboard' && (
-            <div className="h-full flex items-center relative">
+            <div className="h-full flex items-center">
               <button
                 onClick={toggleMobileNav}
                 className={cn(
-                  "flex items-center justify-center px-3 py-1.5 rounded-md text-white font-medium shadow-sm h-8",
-                  "transition-all duration-200",
+                  "flex items-center justify-center px-3 py-1.5 rounded-md text-white font-medium h-8",
                   activeModule?.color?.replace('bg-', '') || 'bg-gradient-to-r from-blue-500 to-blue-600'
                 )}
-                aria-expanded={mobileNavOpen}
-                aria-label="Navigation modules menu"
               >
                 {activeModule && (
                   <activeModule.icon className="w-4 h-4 mr-1.5" />
                 )}
                 <span className="text-xs sm:text-sm">{isExtraSmall ? activeModule?.title?.slice(0, 4) : activeModule?.title}</span>
                 <ChevronDown 
-                  size={14} 
-                  className={cn(
-                    "ml-1 transition-transform", 
-                    mobileNavOpen && "rotate-180"
-                  )}
+                  size={14}
+                  className={cn("ml-1", mobileNavOpen && "rotate-180")}
                 />
               </button>
-              
-              {/* Mobile navigation dropdown */}
-              {mobileNavOpen && (
-                <div 
-                  className="absolute right-0 top-full mt-1 w-56 sm:w-64 bg-white dark:bg-neutral-800 border border-border rounded-lg shadow-lg z-50 overflow-hidden"
-                  style={{
-                    maxHeight: '70vh',
-                    overflowY: 'auto',
-                  }}
-                >
-                  <div className="py-1.5 border-b border-border px-3 text-xs font-medium text-muted-foreground uppercase">
-                    Modules
-                  </div>
-                  <div className="overflow-y-auto divide-y divide-border/30">
-                    {renderMobileNavItems()}
-                  </div>
-                </div>
-              )}
             </div>
           )}
           
@@ -406,81 +387,243 @@ function Header({
             <>
               {/* Blockchain wallet connection */}
               {showWalletConnect && layoutType !== 'auth' && (
-                <div className="h-full flex items-center z-10">
-                  <BlockchainWallet />
+                <div className="h-full flex items-center">
+                  <button
+                    onClick={() => setOpen({ ...open, wallet: !open.wallet, language: false, user: false })}
+                    className="flex items-center px-3 py-1.5 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-xs h-8"
+                    title="Connect Wallet"
+                    aria-label="Connect blockchain wallet"
+                  >
+                    <Wallet className="w-4 h-4 mr-1.5" />
+                    <span className="ml-1 hidden xs:inline">Connect</span>
+                    <span className="hidden sm:inline"> Wallet</span>
+                  </button>
                 </div>
               )}
               
               {/* Language selector */}
-              <div className="h-full flex items-center z-20">
-                <LanguageSelector />
+              <div className="h-full flex items-center">
+                <button
+                  type="button"
+                  onClick={() => setOpen({ ...open, language: !open.language, wallet: false, user: false })}
+                  className="flex items-center justify-center h-8 w-8 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none"
+                  aria-label="Select language"
+                  title="Change language"
+                >
+                  <Globe className="h-4 w-4 text-muted-foreground" />
+                </button>
               </div>
             </>
           )}
           
           {/* Actions Menu Button - Shown only on small screens */}
           {isExtraSmall && layoutType !== 'auth' && (
-            <div className="h-full flex items-center relative z-30">
+            <div className="h-full flex items-center">
               <button
                 onClick={toggleActionsMenu}
                 className="flex items-center justify-center p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 h-8 w-8"
                 aria-label="More actions"
-                aria-expanded={actionsMenuOpen}
               >
                 <MoreHorizontal size={20} />
               </button>
-              
-              {/* Actions dropdown menu */}
-              {actionsMenuOpen && (
-                <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-neutral-800 border border-border rounded-lg shadow-lg z-50 overflow-hidden">
-                  <div className="py-1">
-                    {showWalletConnect && (
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActionsMenuOpen(false);
-                          // Open wallet connect dialog
-                        }}
-                        className="w-full flex items-center px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700"
-                      >
-                        <Wallet className="w-4 h-4 mr-3 text-muted-foreground" />
-                        <span>Connect Wallet</span>
-                      </button>
-                    )}
-                    
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActionsMenuOpen(false);
-                        // Open language selector
-                      }}
-                      className="w-full flex items-center px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700"
-                    >
-                      <Globe className="w-4 h-4 mr-3 text-muted-foreground" />
-                      <span>Change Language</span>
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           )}
           
           {/* User menu - Always visible */}
-          <div className="h-full flex items-center z-40">
-            <UserMenu />
+          <div className="h-full flex items-center">
+            <button 
+              onClick={() => setOpen({ ...open, user: !open.user, wallet: false, language: false })}
+              className="h-8 w-8 flex items-center justify-center rounded-full bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700"
+              aria-label="User menu"
+              title="Account menu"
+            >
+              <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs">
+                U
+              </div>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Global overlay for open menus - prevents layout shifts */}
+      {/* Dropdowns container - positioned absolutely to prevent layout shifts */}
+      <div className="absolute top-full left-0 w-full">
+        {/* Module Navigation Dropdown */}
+        {mobileNavOpen && (
+          <div 
+            className="absolute right-3 md:right-4 top-1 w-56 sm:w-64 bg-white dark:bg-neutral-800 border border-border rounded-lg shadow-lg z-50 overflow-hidden"
+            style={{
+              maxHeight: '70vh',
+              overflowY: 'auto',
+            }}
+          >
+            <div className="py-1.5 border-b border-border px-3 text-xs font-medium text-muted-foreground uppercase">
+              Modules
+            </div>
+            <div className="overflow-y-auto divide-y divide-border/30">
+              {renderMobileNavItems()}
+            </div>
+          </div>
+        )}
+        
+        {/* Actions Dropdown Menu */}
+        {actionsMenuOpen && (
+          <div className="absolute right-3 md:right-4 top-1 w-48 bg-white dark:bg-neutral-800 border border-border rounded-lg shadow-lg z-50 overflow-hidden">
+            <div className="py-1">
+              {showWalletConnect && (
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActionsMenuOpen(false);
+                    // Open wallet connect dialog
+                  }}
+                  className="w-full flex items-center px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                >
+                  <Wallet className="w-4 h-4 mr-3 text-muted-foreground" />
+                  <span>Connect Wallet</span>
+                </button>
+              )}
+              
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActionsMenuOpen(false);
+                  // Open language selector
+                }}
+                className="w-full flex items-center px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700"
+              >
+                <Globe className="w-4 h-4 mr-3 text-muted-foreground" />
+                <span>Change Language</span>
+              </button>
+            </div>
+          </div>
+        )}
+        
+        {/* Language selector dropdown */}
+        {!isExtraSmall && open.language && (
+          <div className="absolute right-[48px] md:right-[60px] top-1 w-48 bg-card border border-border rounded-md shadow-lg z-30 py-1">
+            {LANGUAGES.map((language) => {
+              const isActive = language.code === 'en';
+              
+              return (
+                <button
+                  key={language.code}
+                  onClick={() => {
+                    setOpen({ ...open, language: false });
+                  }}
+                  className={cn(
+                    "flex items-center w-full px-4 py-2 text-sm text-left hover:bg-muted",
+                    isActive && "font-medium"
+                  )}
+                >
+                  <span className="mr-2">{language.flag}</span>
+                  <span className="flex-grow">{language.name}</span>
+                  {isActive && <Check className="h-4 w-4 text-primary" />}
+                </button>
+              );
+            })}
+          </div>
+        )}
+        
+        {/* Wallet details dropdown */}
+        {!isExtraSmall && open.wallet && (
+          <div className="absolute right-[90px] md:right-[110px] top-1 w-64 bg-card rounded-lg shadow-lg z-20 border border-border overflow-hidden">
+            <div className="p-4 border-b border-border">
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium">Connected Wallet</h3>
+                <span className="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+                  Ethereum
+                </span>
+              </div>
+              <p className="text-sm mt-1 font-mono text-muted-foreground">
+                0x71C7656EC7ab88b098defB751B7401B5f6d8976F
+              </p>
+            </div>
+            
+            <div className="p-4 border-b border-border">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Balance:</span>
+                <span className="font-medium">1.234 ETH</span>
+              </div>
+            </div>
+            
+            <div className="p-2">
+              <button
+                onClick={() => {
+                  setOpen({ ...open, wallet: false });
+                }}
+                className="w-full flex items-center px-3 py-2 text-sm rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                View on Explorer
+              </button>
+              
+              <button
+                onClick={() => {
+                  setOpen({ ...open, wallet: false });
+                }}
+                className="w-full flex items-center px-3 py-2 text-sm rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 text-red-500"
+              >
+                <AlertCircle className="w-4 h-4 mr-2" />
+                Disconnect
+              </button>
+            </div>
+          </div>
+        )}
+        
+        {/* User menu dropdown */}
+        {open.user && (
+          <div className="absolute right-3 md:right-4 top-1 w-56 rounded-md shadow-lg bg-card border border-border overflow-hidden z-50">
+            <div className="p-2">
+              <div className="px-4 py-2 text-sm border-b border-border">
+                <p className="font-medium">Account</p>
+                <p className="text-muted-foreground truncate">user@example.com</p>
+              </div>
+              
+              <div className="mt-2">
+                <button 
+                  className="w-full flex items-center px-4 py-2 text-sm hover:bg-muted rounded-md"
+                  onClick={() => {
+                    setOpen({ ...open, user: false });
+                  }}
+                >
+                  <User size={16} className="mr-2" />
+                  Profile
+                </button>
+                
+                <button 
+                  className="w-full flex items-center px-4 py-2 text-sm hover:bg-muted rounded-md"
+                  onClick={() => {
+                    setOpen({ ...open, user: false });
+                  }}
+                >
+                  <Settings size={16} className="mr-2" />
+                  Settings
+                </button>
+                
+                <button 
+                  className="w-full flex items-center px-4 py-2 text-sm hover:bg-muted rounded-md text-error"
+                  onClick={() => {
+                    setOpen({ ...open, user: false });
+                  }}
+                >
+                  <LogOut size={16} className="mr-2" />
+                  Sign out
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+      
+      {/* Overlay for dropdowns - outside main layout flow */}
       {(mobileNavOpen || actionsMenuOpen) && (
         <div 
-          className="fixed inset-0 bg-transparent z-30" 
+          className="fixed inset-0 bg-transparent" 
+          style={{ zIndex: 40 }}
           onClick={() => {
             setMobileNavOpen(false);
             setActionsMenuOpen(false);
           }}
-          aria-hidden="true"
         />
       )}
     </header>

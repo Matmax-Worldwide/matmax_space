@@ -41,32 +41,6 @@ export function LanguageSelector() {
       >
         <Globe className="h-4 w-4 text-muted-foreground" />
       </button>
-      
-      {isOpen && (
-        <>
-          {/* Language dropdown - separate from backdrop */}
-          <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-md shadow-lg z-30 py-1">
-            {LANGUAGES.map((language) => {
-              const isActive = language.code === currentLanguage;
-              
-              return (
-                <button
-                  key={language.code}
-                  onClick={() => changeLanguage(language.code)}
-                  className={cn(
-                    "flex items-center w-full px-4 py-2 text-sm text-left hover:bg-muted",
-                    isActive && "font-medium"
-                  )}
-                >
-                  <span className="mr-2">{language.flag}</span>
-                  <span className="flex-grow">{language.name}</span>
-                  {isActive && <Check className="h-4 w-4 text-primary" />}
-                </button>
-              );
-            })}
-          </div>
-        </>
-      )}
     </div>
   );
 }
