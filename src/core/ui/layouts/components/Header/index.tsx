@@ -342,7 +342,8 @@ function Header({
         {/* Left Section - with proper spacing to align with sidebar */}
         <div className={cn(
           "flex items-center h-full",
-          isMobile ? "pl-4" : sidebarWidth ? `pl-4 md:pl-[${sidebarWidth + 16}px]` : "pl-4"
+          isMobile ? "pl-4" : "pl-4",
+          !isMobile && isSidebarOpen ? "md:pl-[296px]" : !isMobile ? "md:pl-[86px]" : ""
         )}>
           {/* Mobile menu toggle - only shown on mobile/tablet */}
           {showMobileMenu && layoutType === 'dashboard' && isMobileView && (
