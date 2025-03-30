@@ -8,6 +8,7 @@ import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import "./globals.css";
 import { LayoutProvider } from '@/src/core/ui/layouts/providers/LayoutProvider';
+import { Viewport } from 'next';
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -17,7 +18,14 @@ export const metadata = {
   metadataBase: new URL(defaultUrl),
   title: "MatMax Space",
   description: "MatMax Wellness Studio - Your journey to wellness and balance begins here",
-  viewport: "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1.0,
+  maximumScale: 1.0,
+  userScalable: false,
+  viewportFit: 'cover',
 };
 
 const geistSans = Geist({
@@ -32,9 +40,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={geistSans.className} suppressHydrationWarning>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-      </head>
       <body className="bg-background text-foreground">
         <ThemeProvider
           attribute="class"
@@ -42,9 +47,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="min-h-screen overflow-x-hidden">
-            {children}
-          </div>
+          <LayoutProvider>
+            <div className="min-h-screen overflow-x-hidden">
+              {children}
+            </div>
+          </LayoutProvider>
         </ThemeProvider>
       </body>
     </html>
