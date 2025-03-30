@@ -182,9 +182,6 @@ export function MobileMenu({
               )}>
                 {currentSectionData.title}
               </h3>
-              <p className="text-xs text-muted-foreground">
-                {currentSectionData.description}
-              </p>
             </div>
           </div>
         </div>
