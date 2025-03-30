@@ -9,12 +9,12 @@ export default function FinancePage() {
         <svg className="text-sky-500 mt-0.5" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 16V12M12 8H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
-        <div>
+          <div>
           <h3 className="font-medium text-sky-800">Finance Module</h3>
           <p className="text-sky-700">This is the financial management section of MatMax Wellness Studio.</p>
-        </div>
-      </div>
-      
+            </div>
+          </div>
+          
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white dark:bg-zinc-800 border border-border rounded-lg shadow-sm p-5">
           <h2 className="text-xl font-semibold mb-4 text-sky-600">Financial Reports</h2>

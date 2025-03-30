@@ -23,6 +23,9 @@ import {
 import HeaderNav from './HeaderNav';
 import BlockchainWallet from './BlockchainWallet';
 import Logo from './Logo';
+import SettingsMenu from './menus/SettingsMenu';
+import ModuleMenu from './menus/ModuleMenu';
+import MobileMenu from './menus/MobileMenu';
 
 // Define navigation items directly in this file to avoid import issues
 const NAV_ITEMS = [
@@ -317,6 +320,48 @@ function Header({
   // Get current section info
   const currentSectionData = getCurrentSectionData();
   
+  // Open/close mobile menu with animation
+  const toggleMenu = (menuType: string, open: boolean = true) => {
+    if (open) {
+      if (menuType === 'mobile') {
+        setMobileMenuOpen(true);
+        setMenuVisible(true);
+      } else if (menuType === 'module') {
+        setModuleMenuOpen(true);
+        setModuleMenuVisible(true);
+      } else if (menuType === 'settings') {
+        setSettingsMenuOpen(true);
+        setSettingsMenuVisible(true);
+      }
+      
+      // Close other menus
+      if (menuType !== 'mobile' && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+        setMenuVisible(false);
+      }
+      if (menuType !== 'module' && moduleMenuOpen) {
+        setModuleMenuOpen(false);
+        setModuleMenuVisible(false);
+      }
+      if (menuType !== 'settings' && settingsMenuOpen) {
+        setSettingsMenuOpen(false);
+        setSettingsMenuVisible(false);
+      }
+    } else {
+      // When menu is closed, first hide with transition, then actually remove from DOM
+      if (menuType === 'mobile') {
+        setMenuVisible(false);
+        setTimeout(() => setMobileMenuOpen(false), 300);
+      } else if (menuType === 'module') {
+        setModuleMenuVisible(false);
+        setTimeout(() => setModuleMenuOpen(false), 300);
+      } else if (menuType === 'settings') {
+        setSettingsMenuVisible(false);
+        setTimeout(() => setSettingsMenuOpen(false), 300);
+      }
+    }
+  };
+
   return (
     <header className={cn(
       'w-full h-16 bg-white dark:bg-neutral-900 border-b border-border flex items-center justify-between px-4 z-20',
@@ -349,7 +394,7 @@ function Header({
                   onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
-                    setMobileMenuOpen(true);
+                    toggleMenu('mobile');
                   }}
                   className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                   aria-label="Toggle main menu"
@@ -365,7 +410,7 @@ function Header({
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
-                  setModuleMenuOpen(true);
+                  toggleMenu('module');
                 }}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                 aria-label="Switch modules"
@@ -388,7 +433,7 @@ function Header({
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
-                  setSettingsMenuOpen(true);
+                  toggleMenu('settings');
                 }}
                 className="flex h-9 w-9 items-center justify-center rounded-md border border-border hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                 aria-label="Manage account settings"
@@ -407,7 +452,7 @@ function Header({
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
-                  setSettingsMenuOpen(true);
+                  toggleMenu('settings');
                 }}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                 aria-label="Manage account"
@@ -422,618 +467,68 @@ function Header({
         </div>
         </div>
         
-      {/* Mobile Module Menu - Slides in from right */}
-      {moduleMenuOpen && (
-        <div 
-          className={cn(
-            "fixed inset-0 bg-white dark:bg-neutral-900 z-50 flex flex-col transition-transform duration-300 ease-in-out",
-            moduleMenuVisible ? "translate-x-0" : "translate-x-full"
-          )}
-        >
-          {/* Menu Header */}
-          <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-700">
-            <h2 className="font-bold text-lg">Switch Module</h2>
-            <button 
-              onClick={() => setModuleMenuOpen(false)}
-              className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
-          </div>
-          
-          {/* Module Options - Scrollable */}
-          <div className="flex-1 overflow-y-auto p-4">
-            <div className="space-y-3">
-              {NAV_ITEMS.map((item: NavItem) => {
-                const isActive = item.section.toLowerCase() === activeSection?.toLowerCase();
-                return (
-            <button
-                    key={item.section}
-              onClick={(e) => {
-                      e.preventDefault();
-                      
-                      // Close the menu
-                      setModuleMenuOpen(false);
-                      
-                      // Get section name in lowercase
-                      const sectionName = item.section.toLowerCase();
-                      
-                      // Update active section
-                      setActiveSection(sectionName);
-                      
-                      // Store in localStorage
-                      if (typeof window !== 'undefined') {
-                        localStorage.setItem('activeSection', sectionName);
-                      }
-                      
-                      // Navigate to protected page with section parameter
-                      router.push(`/protected?section=${sectionName}`);
-                    }}
-                    className={cn(
-                      "flex w-full items-center px-4 py-3 rounded-lg",
-                      isActive 
-                        ? `bg-gradient-to-r ${item.color} text-white`
-                        : "border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                    )}
-                  >
-                    <item.icon className="w-5 h-5 mr-3" />
-                    <span className="text-base font-medium">{item.title}</span>
-                    {item.children && item.children.length > 0 && (
-                      <span className="ml-auto text-xs bg-white/20 rounded-full px-2 py-0.5">
-                        {item.children.length} submenu{item.children.length !== 1 ? 's' : ''}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-            
-            {/* Current active module description */}
-            <div className="mt-6 p-4 rounded-lg bg-neutral-100 dark:bg-neutral-800">
-              <div className="flex items-center mb-2">
-                <currentSectionData.icon className={cn(
-                  "w-5 h-5 mr-2",
-                  currentSectionData.color.replace('from-', 'text-').split(' ')[0]
-                )} />
-                <h3 className={cn(
-                  "font-bold",
-                  currentSectionData.color.replace('from-', 'text-').split(' ')[0]
-                )}>Active: {currentSectionData.title}</h3>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Switch between different modules to access specific features and functionality.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Mobile Menu */}
+      <MobileMenu 
+        isOpen={mobileMenuOpen} 
+        onClose={() => toggleMenu('mobile', false)} 
+        mobileMenuVisible={menuVisible}
+        sidebarItems={[
+          {
+            title: "Dashboard",
+            href: "/protected?section=main",
+            icon: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+          },
+          {
+            title: "Analytics",
+            href: "/protected?section=main&page=analytics",
+            icon: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          },
+          {
+            title: "Courses",
+            href: "/protected?section=lms",
+            icon: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          },
+          {
+            title: "Users",
+            href: "/protected?section=admin",
+            icon: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          },
+          {
+            title: "Transactions",
+            href: "/protected?section=finance",
+            icon: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+          },
+        ]}
+        notificationCount={3}
+        userProfile={{
+          name: "Albert Saco",
+          role: "Administrator",
+          avatar: "/images/avatar.jpg"
+        }}
+      />
       
-      {/* Mobile Sidebar Menu - Slides in from left */}
-      {isMobileView && showMobileMenu && mobileMenuOpen && (
-        <div 
-          className={cn(
-            "fixed inset-0 bg-white dark:bg-neutral-900 z-50 flex flex-col transition-transform duration-300 ease-in-out",
-            menuVisible ? "translate-x-0" : "-translate-x-full"
-          )}
-        >
-          {/* Menu Header */}
-          <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-700">
-            <h2 className="font-bold text-lg">Main Menu</h2>
-            <button 
-              onClick={() => setMobileMenuOpen(false)}
-              className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
-          </div>
-          
-          {/* Menu Options - Scrollable */}
-          <div className="flex-1 overflow-y-auto p-4">
-            <div className="space-y-3">
-              {/* If current module has children, display them */}
-              {currentSectionData.children && currentSectionData.children.length > 0 && (
-                <>
-                  <div className="flex items-center mb-2">
-                    <currentSectionData.icon className={cn(
-                      "w-5 h-5 mr-2",
-                      currentSectionData.color.replace('from-', 'text-').split(' ')[0]
-                    )} />
-                    <h3 className={cn(
-                      "font-bold",
-                      currentSectionData.color.replace('from-', 'text-').split(' ')[0]
-                    )}>{currentSectionData.title} NAVIGATION</h3>
-                  </div>
-                  
-                  {currentSectionData.children.map((child, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        router.push(child.href);
-                      }}
-                      className={cn(
-                        "flex w-full items-center px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800",
-                        pathname === child.href ? `bg-gradient-to-r ${currentSectionData.color} text-white` : ""
-                      )}
-                    >
-                      <span className="text-base font-medium">{child.title}</span>
-                    </button>
-                  ))}
-                  
-                  <div className="h-4"></div>
-                </>
-              )}
-              
-              {/* Common navigation links */}
-              <div className="mb-2">
-                <h3 className="text-sm font-medium text-muted-foreground mb-1 px-1">Quick Access</h3>
-              </div>
-              
-              <button 
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  router.push('/dashboard');
-                }}
-                className="flex w-full items-center px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-              >
-                <Home className="w-5 h-5 mr-3 text-muted-foreground" />
-                <span className="text-base font-medium">Dashboard</span>
-              </button>
-              
-              <button 
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  router.push('/profile');
-                }}
-                className="flex w-full items-center px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-              >
-                <User className="w-5 h-5 mr-3 text-muted-foreground" />
-                <span className="text-base font-medium">Profile</span>
-              </button>
-              
-              <button 
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  router.push('/settings');
-                }}
-                className="flex w-full items-center px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-              >
-                <Settings className="w-5 h-5 mr-3 text-muted-foreground" />
-                <span className="text-base font-medium">Settings</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Module Menu */}
+      <ModuleMenu 
+        isOpen={moduleMenuOpen} 
+        onClose={() => toggleMenu('module', false)} 
+        moduleMenuVisible={moduleMenuVisible}
+        onSectionSelect={(sectionId) => {
+          setActiveSection(sectionId);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('activeSection', sectionId);
+          }
+          router.push(`/protected?section=${sectionId}`);
+        }}
+        currentSectionId={activeSection}
+      />
       
       {/* Settings Menu */}
       <SettingsMenu 
         isOpen={settingsMenuOpen} 
-        onClose={() => setSettingsMenuOpen(false)} 
+        onClose={() => toggleMenu('settings', false)} 
         settingsMenuVisible={settingsMenuVisible} 
       />
     </header>
-  );
-}
-
-/**
- * Settings Menu Component
- * This appears when the Manage Account button is clicked
- */
-function SettingsMenu({ isOpen, onClose, settingsMenuVisible }: { isOpen: boolean; onClose: () => void; settingsMenuVisible: boolean }) {
-  if (!isOpen) return null;
-  
-  const [showLanguages, setShowLanguages] = useState(false);
-  const [showWalletOptions, setShowWalletOptions] = useState(false);
-  const [showThemeOptions, setShowThemeOptions] = useState(false);
-  const { isMobile, isTablet, theme, setTheme } = useLayout();
-  const isMobileView = isMobile || isTablet;
-  
-  // Available languages
-  const LANGUAGES = [
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'es', name: 'Español', flag: '🇪🇸' },
-    { code: 'fr', name: 'Français', flag: '🇫🇷' },
-    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-    { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
-  ];
-  
-  // Available wallet options
-  const WALLET_OPTIONS = [
-    { id: 'metamask', name: 'MetaMask', icon: '🦊' },
-    { id: 'coinbase', name: 'Coinbase Wallet', icon: '💰' },
-    { id: 'walletconnect', name: 'WalletConnect', icon: '🔗' },
-    { id: 'phantom', name: 'Phantom', icon: '👻' }
-  ];
-  
-  // Theme options
-  const THEME_OPTIONS = [
-    { id: 'light', name: 'Light Theme', icon: '☀️' },
-    { id: 'dark', name: 'Dark Theme', icon: '🌙' },
-    { id: 'system', name: 'System Theme', icon: '💻' }
-  ];
-  
-  // Function to go back to main menu
-  const goBackToMain = () => {
-    setShowLanguages(false);
-    setShowWalletOptions(false);
-    setShowThemeOptions(false);
-  };
-  
-  // Set theme function
-  const handleThemeChange = (newTheme: string) => {
-    setTheme(newTheme as 'light' | 'dark' | 'system');
-  };
-  
-  // Use slide-in panel for mobile and modal for desktop
-  return (
-    <>
-      {isMobileView ? (
-        <div 
-          className={cn(
-            "fixed inset-0 bg-white dark:bg-neutral-900 z-50 flex flex-col transition-transform duration-300 ease-in-out",
-            settingsMenuVisible ? "translate-x-0" : "translate-x-full"
-          )}
-        >
-          {/* Menu Header */}
-          <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-700">
-            <h2 className="font-bold text-lg">
-              {showLanguages ? "Language Settings" : 
-               showWalletOptions ? "Wallet Options" : 
-               showThemeOptions ? "Theme Settings" :
-               "Account Settings"}
-            </h2>
-            <div className="flex items-center">
-              {(showLanguages || showWalletOptions || showThemeOptions) && (
-                <button 
-                  onClick={goBackToMain}
-                  className="mr-2 p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                </button>
-              )}
-              <button 
-                onClick={onClose}
-                className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </button>
-            </div>
-          </div>
-          
-          {/* Settings Options - Scrollable */}
-          <div className="flex-1 overflow-y-auto p-4">
-            {/* Main Menu Options */}
-            {!showLanguages && !showWalletOptions && !showThemeOptions && (
-              <div className="space-y-3">
-                <button className="flex w-full items-center px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800">
-                  <User className="w-5 h-5 mr-3 text-muted-foreground" />
-                  <span className="text-base font-medium">Profile Settings</span>
-                </button>
-                
-                <button 
-                  className="flex w-full items-center justify-between px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                  onClick={() => setShowLanguages(true)}
-                >
-                  <div className="flex items-center">
-                    <Globe className="w-5 h-5 mr-3 text-muted-foreground" />
-                    <span className="text-base font-medium">Language Settings</span>
-                  </div>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </button>
-                
-                <button 
-                  className="flex w-full items-center justify-between px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                  onClick={() => setShowWalletOptions(true)}
-                >
-                  <div className="flex items-center">
-                    <CreditCard className="w-5 h-5 mr-3 text-muted-foreground" />
-                    <span className="text-base font-medium">Wallet Options</span>
-                  </div>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </button>
-                
-            <button
-                  className="flex w-full items-center justify-between px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                  onClick={() => setShowThemeOptions(true)}
-                >
-                  <div className="flex items-center">
-                    {theme === 'light' ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 mr-3 text-muted-foreground">
-                        <circle cx="12" cy="12" r="5"></circle>
-                        <line x1="12" y1="1" x2="12" y2="3"></line>
-                        <line x1="12" y1="21" x2="12" y2="23"></line>
-                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                        <line x1="1" y1="12" x2="3" y2="12"></line>
-                        <line x1="21" y1="12" x2="23" y2="12"></line>
-                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                      </svg>
-                    ) : theme === 'dark' ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 mr-3 text-muted-foreground">
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                      </svg>
-                    ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 mr-3 text-muted-foreground">
-                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                        <line x1="8" y1="21" x2="16" y2="21"></line>
-                        <line x1="12" y1="17" x2="12" y2="21"></line>
-                      </svg>
-                    )}
-                    <span className="text-base font-medium">Theme Settings</span>
-                  </div>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </button>
-                
-                <button className="flex w-full items-center px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800">
-                  <Settings className="w-5 h-5 mr-3 text-muted-foreground" />
-                  <span className="text-base font-medium">App Settings</span>
-                </button>
-                
-                <div className="h-4"></div>
-                
-                <button className="flex w-full items-center px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 dark:text-red-400">
-                  <LogOut className="w-5 h-5 mr-3" />
-                  <span className="text-base font-medium">Sign Out</span>
-            </button>
-              </div>
-            )}
-            
-            {/* Language Options */}
-            {showLanguages && (
-              <div className="space-y-3">
-                {LANGUAGES.map((lang) => (
-                  <button 
-                    key={lang.code}
-                    className="flex w-full items-center justify-between px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                  >
-                    <div className="flex items-center">
-                      <span className="text-xl mr-3">{lang.flag}</span>
-                      <span className="text-base font-medium">{lang.name}</span>
-                    </div>
-                    {lang.code === 'en' && (
-                      <Check className="h-5 w-5 text-green-500" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
-            
-            {/* Wallet Options */}
-            {showWalletOptions && (
-              <div className="space-y-3">
-                <div className="px-2 mb-2">
-                  <p className="text-sm text-muted-foreground">Select a wallet to connect to the application</p>
-                </div>
-                
-                {WALLET_OPTIONS.map((wallet) => (
-                  <button 
-                    key={wallet.id}
-                    className="flex w-full items-center px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                  >
-                    <span className="text-xl mr-3">{wallet.icon}</span>
-                    <span className="text-base font-medium">{wallet.name}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-            
-            {/* Theme Options */}
-            {showThemeOptions && (
-              <div className="space-y-3">
-                {THEME_OPTIONS.map((themeOption) => (
-                  <button 
-                    key={themeOption.id}
-                    onClick={() => handleThemeChange(themeOption.id)}
-                    className={cn(
-                      "flex w-full items-center justify-between px-4 py-3 rounded-lg border",
-                      theme === themeOption.id 
-                        ? "bg-neutral-100 dark:bg-neutral-800 border-primary" 
-                        : "border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                    )}
-                  >
-                    <div className="flex items-center">
-                      <span className="text-xl mr-3">{themeOption.icon}</span>
-                      <span className="text-base font-medium">{themeOption.name}</span>
-                    </div>
-                    {theme === themeOption.id && (
-                      <Check className="h-5 w-5 text-green-500" />
-                    )}
-                  </button>
-                ))}
-                <div className="px-2 mt-2">
-                  <p className="text-xs text-muted-foreground">
-                    System theme will automatically switch between light and dark mode based on your device settings.
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      ) : (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-neutral-900 rounded-lg w-full max-w-xl p-6 shadow-xl">
-            {/* Header with back button when in submenus */}
-            <div className="flex justify-between items-center mb-4">
-              {(showLanguages || showWalletOptions || showThemeOptions) ? (
-                <div className="flex items-center">
-                  <button 
-                    onClick={goBackToMain}
-                    className="mr-2 p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                  </button>
-                  <h2 className="text-xl font-semibold">
-                    {showLanguages ? "Language Settings" : 
-                     showWalletOptions ? "Wallet Options" : 
-                     showThemeOptions ? "Theme Settings" :
-                     "Account Settings"}
-                  </h2>
-                </div>
-              ) : (
-                <h2 className="text-xl font-semibold">Account Settings</h2>
-              )}
-              <button 
-                onClick={onClose} 
-                className="p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
-              >
-                <span className="sr-only">Close</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-              </button>
-            </div>
-            
-            {/* Main Menu Options */}
-            {!showLanguages && !showWalletOptions && !showThemeOptions && (
-              <div className="space-y-4">
-                <div className="flex items-center gap-4 p-3.5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer">
-                  <User className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-base">Profile Settings</span>
-                </div>
-                
-                <div 
-                  className="flex items-center justify-between p-3.5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer"
-                  onClick={() => setShowLanguages(true)}
-                >
-                  <div className="flex items-center gap-4">
-                    <Globe className="h-5 w-5 text-muted-foreground" />
-                    <span className="text-base">Language Settings</span>
-                  </div>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </div>
-                
-                <div 
-                  className="flex items-center justify-between p-3.5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer"
-                  onClick={() => setShowWalletOptions(true)}
-                >
-                  <div className="flex items-center gap-4">
-                    <CreditCard className="h-5 w-5 text-muted-foreground" />
-                    <span className="text-base">Wallet Options</span>
-                  </div>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </div>
-                
-                <div 
-                  className="flex items-center justify-between p-3.5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer"
-                  onClick={() => setShowThemeOptions(true)}
-                >
-                  <div className="flex items-center gap-4">
-                    {theme === 'light' ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-muted-foreground">
-                        <circle cx="12" cy="12" r="5"></circle>
-                        <line x1="12" y1="1" x2="12" y2="3"></line>
-                        <line x1="12" y1="21" x2="12" y2="23"></line>
-                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                        <line x1="1" y1="12" x2="3" y2="12"></line>
-                        <line x1="21" y1="12" x2="23" y2="12"></line>
-                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                      </svg>
-                    ) : theme === 'dark' ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-muted-foreground">
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                      </svg>
-                    ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-muted-foreground">
-                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                        <line x1="8" y1="21" x2="16" y2="21"></line>
-                        <line x1="12" y1="17" x2="12" y2="21"></line>
-                      </svg>
-                    )}
-                    <span className="text-base">Theme Settings</span>
-                  </div>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </div>
-                
-                <div className="flex items-center gap-4 p-3.5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer">
-                  <Settings className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-base">App Settings</span>
-                </div>
-                
-                <hr className="border-border" />
-                
-                <div className="flex items-center gap-4 p-3.5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 text-red-500 dark:text-red-400 cursor-pointer">
-                  <LogOut className="h-5 w-5" />
-                  <span className="text-base">Sign Out</span>
-                </div>
-              </div>
-            )}
-            
-            {/* Language Options */}
-            {showLanguages && (
-              <div className="space-y-4">
-                {LANGUAGES.map((lang) => (
-                  <div 
-                    key={lang.code}
-                    className="flex items-center gap-4 p-3.5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer"
-                  >
-                    <span className="text-xl">{lang.flag}</span>
-                    <span className="text-base">{lang.name}</span>
-                    {lang.code === 'en' && (
-                      <Check className="ml-auto h-4 w-4 text-green-500" />
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-            
-            {/* Wallet Options */}
-            {showWalletOptions && (
-              <div className="space-y-4">
-                <p className="text-sm text-muted-foreground mb-2">Select a wallet to connect to the application</p>
-                
-                {WALLET_OPTIONS.map((wallet) => (
-                  <div 
-                    key={wallet.id}
-                    className="flex items-center gap-4 p-3.5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer border border-border"
-                  >
-                    <span className="text-xl">{wallet.icon}</span>
-                    <span className="text-base">{wallet.name}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-            
-            {/* Theme Options */}
-            {showThemeOptions && (
-              <div className="space-y-4">
-                {THEME_OPTIONS.map((themeOption) => (
-                  <div 
-                    key={themeOption.id}
-                    onClick={() => handleThemeChange(themeOption.id)}
-                    className={cn(
-                      "flex items-center gap-4 p-3.5 rounded-md cursor-pointer",
-                      theme === themeOption.id
-                        ? "bg-neutral-100 dark:bg-neutral-800"
-                        : "hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                    )}
-                  >
-                    <span className="text-xl">{themeOption.icon}</span>
-                    <span className="text-base">{themeOption.name}</span>
-                    {theme === themeOption.id && (
-                      <Check className="ml-auto h-4 w-4 text-green-500" />
-                    )}
-                  </div>
-                ))}
-                <p className="text-xs text-muted-foreground mt-2">
-                  System theme will automatically switch between light and dark mode based on your device settings.
-                </p>
-              </div>
-            )}
-        </div>
-      </div>
-      )}
-    </>
   );
 }
 
