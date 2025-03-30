@@ -163,8 +163,8 @@ function Header({
   // Handle navigation
   const handleNavigation = (href: string) => {
     // Close all dropdowns
-    setDropdowns({
-      language: false,
+      setDropdowns({
+        language: false,
       user: false,
       section: false
     });
@@ -196,13 +196,13 @@ function Header({
     setWalletModalOpen(!walletModalOpen);
     setLanguageModalOpen(false);
     setMobileMenuOpen(false);
-    setDropdowns({
-      language: false,
+      setDropdowns({
+        language: false,
       user: false,
       section: false
-    });
-  };
-  
+      });
+    };
+    
   // Toggle specific dropdowns directly
   const toggleUserDropdown = () => {
     setDropdowns(prev => ({
@@ -321,7 +321,7 @@ function Header({
     <header className={cn(
       'w-full h-16 bg-white dark:bg-neutral-900 border-b border-border flex items-center justify-between px-4 z-20',
       transparent && 'bg-transparent dark:bg-transparent border-transparent',
-      className
+        className
     )}>
       {/* Container with grid layout for better alignment */}
       <div className="w-full grid grid-cols-3 items-center">
@@ -337,8 +337,8 @@ function Header({
               <Menu className="h-5 w-5 text-muted-foreground" />
             </button>
           )}
-          <Logo size="default" darkModeInvert={true} />
-        </div>
+            <Logo size="default" darkModeInvert={true} />
+          </div>
         
         {/* Center - Navigation */}
         <div className="flex justify-center">
@@ -350,7 +350,24 @@ function Header({
           {/* Mobile actions only shown on mobile */}
           {isMobileView && (
             <>
-              {/* Vertical actions on mobile view */}
+              {/* Module switcher button for mobile */}
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  setModuleMenuOpen(true);
+                }}
+                className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                aria-label="Switch modules"
+                data-action="module-switcher"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+                  <rect width="7" height="7" x="3" y="3" rx="1" />
+                  <rect width="7" height="7" x="14" y="3" rx="1" />
+                  <rect width="7" height="7" x="14" y="14" rx="1" />
+                  <rect width="7" height="7" x="3" y="14" rx="1" />
+                </svg>
+              </button>
             </>
           )}
           
@@ -376,6 +393,95 @@ function Header({
           )}
         </div>
       </div>
+      
+      {/* Mobile Module Menu - Slides in from right */}
+      {moduleMenuOpen && (
+        <div 
+          className={cn(
+            "fixed inset-0 bg-white dark:bg-neutral-900 z-50 flex flex-col transition-transform duration-300 ease-in-out",
+            moduleMenuVisible ? "translate-x-0" : "translate-x-full"
+          )}
+        >
+          {/* Menu Header */}
+          <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-700">
+            <h2 className="font-bold text-lg">Switch Module</h2>
+            <button 
+              onClick={() => setModuleMenuOpen(false)}
+              className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          
+          {/* Module Options - Scrollable */}
+          <div className="flex-1 overflow-y-auto p-4">
+            <div className="space-y-3">
+              {NAV_ITEMS.map((item: NavItem) => {
+                const isActive = item.section.toLowerCase() === activeSection?.toLowerCase();
+                return (
+                  <button
+                    key={item.section}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      
+                      // Close the menu
+                      setModuleMenuOpen(false);
+                      
+                      // Get section name in lowercase
+                      const sectionName = item.section.toLowerCase();
+                      
+                      // Update active section
+                      setActiveSection(sectionName);
+                      
+                      // Store in localStorage
+                      if (typeof window !== 'undefined') {
+                        localStorage.setItem('activeSection', sectionName);
+                      }
+                      
+                      // Navigate to protected page with section parameter
+                      router.push(`/protected?section=${sectionName}`);
+                    }}
+                    className={cn(
+                      "flex w-full items-center px-4 py-3 rounded-lg",
+                      isActive 
+                        ? `bg-gradient-to-r ${item.color} text-white`
+                        : "border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                    )}
+                  >
+                    <item.icon className="w-5 h-5 mr-3" />
+                    <span className="text-base font-medium">{item.title}</span>
+                    {item.children && item.children.length > 0 && (
+                      <span className="ml-auto text-xs bg-white/20 rounded-full px-2 py-0.5">
+                        {item.children.length} submenu{item.children.length !== 1 ? 's' : ''}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            
+            {/* Current active module description */}
+            <div className="mt-6 p-4 rounded-lg bg-neutral-100 dark:bg-neutral-800">
+              <div className="flex items-center mb-2">
+                <currentSectionData.icon className={cn(
+                  "w-5 h-5 mr-2",
+                  currentSectionData.color.replace('from-', 'text-').split(' ')[0]
+                )} />
+                <h3 className={cn(
+                  "font-bold",
+                  currentSectionData.color.replace('from-', 'text-').split(' ')[0]
+                )}>Active: {currentSectionData.title}</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Switch between different modules to access specific features and functionality.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Settings Menu */}
       <SettingsMenu isOpen={settingsMenuOpen} onClose={() => setSettingsMenuOpen(false)} />
@@ -499,9 +605,9 @@ function SettingsMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
               >
                 <span className="text-xl">{lang.flag}</span>
                 <span className="text-base">{lang.name}</span>
-                {lang.code === 'en' && (
+                      {lang.code === 'en' && (
                   <Check className="ml-auto h-4 w-4 text-green-500" />
-                )}
+                      )}
               </div>
             ))}
           </div>
