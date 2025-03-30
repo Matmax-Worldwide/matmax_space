@@ -357,16 +357,20 @@ function Header({
                   e.preventDefault();
                   setModuleMenuOpen(true);
                 }}
-                className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                 aria-label="Switch modules"
                 data-action="module-switcher"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
                   <rect width="7" height="7" x="3" y="3" rx="1" />
                   <rect width="7" height="7" x="14" y="3" rx="1" />
                   <rect width="7" height="7" x="14" y="14" rx="1" />
                   <rect width="7" height="7" x="3" y="14" rx="1" />
                 </svg>
+                <span className={cn(
+                  "text-sm font-medium",
+                  currentSectionData.color.replace('from-', 'text-').split(' ')[0]
+                )}>{currentSectionData.title}</span>
               </button>
             </>
           )}
