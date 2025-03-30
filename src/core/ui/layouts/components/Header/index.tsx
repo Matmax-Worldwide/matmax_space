@@ -328,17 +328,33 @@ function Header({
         {/* Left side - Logo and toggle */}
         <div className="flex items-center gap-2">
           {isMobileView && showMobileMenu && (
-            <button 
-              onClick={toggleSidebar}
-              className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors" 
-              aria-label="Toggle menu"
-              data-menu="toggle"
-            >
-              <Menu className="h-5 w-5 text-muted-foreground" />
-            </button>
+            <>
+              <button 
+                onClick={toggleSidebar}
+                className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors" 
+                aria-label="Toggle menu"
+                data-menu="toggle"
+              >
+                <Menu className="h-5 w-5 text-muted-foreground" />
+              </button>
+              
+              {/* Account settings button for mobile */}
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  setSettingsMenuOpen(true);
+                }}
+                className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                aria-label="Manage account settings"
+                data-action="manage-account-mobile"
+              >
+                <Settings className="h-5 w-5 text-muted-foreground" />
+              </button>
+            </>
           )}
-            <Logo size="default" darkModeInvert={true} />
-          </div>
+          <Logo size="default" darkModeInvert={true} />
+        </div>
         
         {/* Center - Navigation */}
         <div className="flex justify-center">
