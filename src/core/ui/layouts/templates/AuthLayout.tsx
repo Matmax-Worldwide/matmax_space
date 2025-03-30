@@ -107,25 +107,25 @@ export function AuthLayout({
         {/* Right side - Authentication form */}
         <div className={cn(
           "flex flex-col justify-center items-center relative z-10",
-          isMobile ? "w-full py-6" : "w-1/2",
+          isMobile ? "w-full py-4" : "w-1/2",
           isSmallMobile ? "px-4" : "px-8"
         )}>
           {/* Mobile logo - only shown on mobile */}
           {showLogo && (
-            <div className="md:hidden mb-10 flex flex-col items-center">
+            <div className="md:hidden mb-6 flex flex-col items-center">
               <Logo 
-                className={isSmallMobile ? "w-48 h-48" : "w-64 h-64"} 
+                className={isSmallMobile ? "w-40 h-40" : "w-56 h-56"}
                 darkModeInvert={true}
                 size="auth"
                 lightBackground={false}
               />
               <h1 className={cn(
-                "font-bold mt-4 text-center text-white",
+                "font-bold mt-2 text-center text-white",
                 isSmallMobile ? "text-xl" : "text-2xl"
               )}>
                 MatMax Wellness Studio
               </h1>
-              <p className="text-lg max-w-md text-white opacity-90 mt-2 text-center">
+              <p className="text-md max-w-md text-white opacity-90 mt-1 text-center">
                 welcome to our universe
               </p>
             </div>
@@ -133,22 +133,22 @@ export function AuthLayout({
           
           <div className={cn(
             "w-full",
-            isSmallMobile ? "max-w-[330px]" : "max-w-md",
+            isSmallMobile ? "max-w-[320px]" : "max-w-md",
             contentClassName
           )}>
             {/* Title and description */}
             {(title || description) && (
               <div className={cn(
-                "mb-6 text-center",
-                isSmallMobile && "mb-4"
+                "mb-4 text-center",
+                isSmallMobile && "mb-3"
               )}>
                 {title && <h2 className={cn(
                   "font-bold text-white",
-                  isSmallMobile ? "text-xl" : "text-2xl"
+                  isSmallMobile ? "text-lg" : "text-2xl"
                 )}>{title}</h2>}
                 {description && <p className={cn(
                   "text-white mt-1 opacity-80",
-                  isSmallMobile && "text-sm"
+                  isSmallMobile ? "text-xs" : "text-sm"
                 )}>{description}</p>}
               </div>
             )}
@@ -156,7 +156,7 @@ export function AuthLayout({
             {/* Main content - authentication form */}
             <div className={cn(
               "bg-card/95 backdrop-blur-sm border border-border/50 rounded-lg shadow-lg",
-              isSmallMobile ? "p-4" : "p-6" 
+              isSmallMobile ? "p-3" : "p-6"
             )}>
               {children}
             </div>
@@ -164,7 +164,7 @@ export function AuthLayout({
             {/* Footer */}
             {footer && (
               <div className={cn(
-                "mt-4 text-center text-white", 
+                "mt-3 text-center text-white",
                 isSmallMobile ? "text-xs" : "text-sm"
               )}>
                 {footer}
@@ -688,64 +688,92 @@ export function AuthLayout({
           /* Mobile-specific adjustments */
           @media (max-width: 768px) {
             .stars-small, .stars-medium, .stars-large {
-              background-size: 200px 200px;
+              background-size: 180px 180px;
             }
             
             .spiral-galaxy {
-              width: 150px;
-              height: 150px;
+              width: 120px;
+              height: 120px;
               left: 50%;
-              top: 45%;
+              top: 40%;
             }
             
             .supernova-1 {
               transform-origin: center;
-              transform: scale(0.8);
-              left: 40%;
-              top: 30%;
+              transform: scale(0.7);
+              left: 45%;
+              top: 28%;
             }
             
             .supernova-2 {
               transform-origin: center;
-              transform: scale(0.8);
-              left: 55%;
-              top: 55%;
+              transform: scale(0.7);
+              left: 53%;
+              top: 52%;
             }
             
             .supernova-3 {
               transform-origin: center;
-              transform: scale(0.8);
-              left: 45%;
-              top: 20%;
+              transform: scale(0.7);
+              left: 48%;
+              top: 17%;
             }
             
             .galaxies {
-              background-size: 400px 400px;
+              background-size: 350px 350px;
               background-position: center;
             }
             
             .star-clusters {
-              background-size: 600px 600px;
+              background-size: 500px 500px;
               background-position: center;
             }
             
             .aurora {
               bottom: 0;
               opacity: 0.25;
+              height: 250px;
             }
             
             .comets::before {
-              left: 10%;
+              left: 15%;
               top: 25%;
+              width: 150px;
             }
             
             .comets::after {
-              left: 40%;
+              left: 45%;
               top: 60%;
+              width: 120px;
             }
             
             .nebula-1, .nebula-2 {
               background-position: center;
+              transform: scale(0.9);
+            }
+
+            .shooting-stars::before, .shooting-stars::after {
+              width: 100px;
+            }
+
+            .stars-small, .stars-medium, .stars-large, 
+            .nebula-1, .nebula-2, .galaxies, .cosmic-dust {
+              background-position: center center;
+            }
+            
+            @media (max-width: 375px) {
+              .spiral-galaxy {
+                width: 100px;
+                height: 100px;
+              }
+              
+              .supernova-1, .supernova-2, .supernova-3 {
+                transform: scale(0.6);
+              }
+              
+              .aurora {
+                height: 200px;
+              }
             }
           }
         `}</style>
