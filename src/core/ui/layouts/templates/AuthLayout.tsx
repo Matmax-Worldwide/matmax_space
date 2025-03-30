@@ -106,13 +106,12 @@ export function AuthLayout({
         
         {/* Right side - Authentication form */}
         <div className={cn(
-          "flex flex-col justify-center items-center relative z-10",
-          isMobile ? "w-full py-2" : "w-1/2",
-          isSmallMobile ? "px-4" : "px-8"
+          "flex flex-col justify-center items-center relative z-10 w-full",
+          isMobile ? "py-2 px-4" : "w-1/2 px-8"
         )}>
           {/* Mobile logo - only shown on mobile */}
           {showLogo && (
-            <div className="md:hidden mb-1 flex flex-col items-center">
+            <div className="md:hidden mb-1 flex flex-col items-center w-full">
               <Logo 
                 className={isSmallMobile ? "w-32 h-32" : "w-40 h-40"}
                 darkModeInvert={true}
@@ -120,12 +119,12 @@ export function AuthLayout({
                 lightBackground={false}
               />
               <h1 className={cn(
-                "font-bold mt-0 text-center text-white",
+                "font-bold mt-0 text-center text-white w-full",
                 isSmallMobile ? "text-lg" : "text-xl"
               )}>
                 MatMax Wellness Studio
               </h1>
-              <p className="text-sm max-w-md text-white opacity-90 mt-0 mb-1 text-center">
+              <p className="text-sm text-white opacity-90 mt-0 mb-1 text-center w-full">
                 welcome to our universe
               </p>
             </div>
@@ -133,13 +132,13 @@ export function AuthLayout({
           
           <div className={cn(
             "w-full mt-0",
-            isSmallMobile ? "max-w-[320px]" : "max-w-md",
+            isMobile ? "px-3" : "max-w-md",
             contentClassName
           )}>
             {/* Title and description */}
             {(title || description) && (
               <div className={cn(
-                "mb-2 text-center",
+                "mb-2 text-center w-full",
                 isSmallMobile && "mb-2"
               )}>
                 {title && <h2 className={cn(
@@ -155,7 +154,7 @@ export function AuthLayout({
             
             {/* Main content - authentication form */}
             <div className={cn(
-              "bg-card/95 backdrop-blur-sm border border-border/50 rounded-lg shadow-lg",
+              "bg-card/95 backdrop-blur-sm border border-border/50 rounded-lg shadow-lg w-full",
               isSmallMobile ? "p-3" : "p-5"
             )}>
               {children}
@@ -164,7 +163,7 @@ export function AuthLayout({
             {/* Footer */}
             {footer && (
               <div className={cn(
-                "mt-2 text-center text-white",
+                "mt-2 text-center text-white w-full",
                 isSmallMobile ? "text-xs" : "text-sm"
               )}>
                 {footer}
@@ -776,10 +775,15 @@ export function AuthLayout({
               }
             }
             
-            /* Adjust layout for mobile to position content higher */
-            .flex.min-h-screen {
-              align-items: flex-start;
-              padding-top: 1vh;
+            /* Fix width issues in mobile */
+            .min-h-screen {
+              width: 100vw; /* Force full viewport width */
+              max-width: 100%; /* Prevent horizontal scrolling */
+            }
+            
+            /* Ensure the form takes up full width */
+            .flex.min-h-screen > div {
+              width: 100% !important;
             }
             
             /* Additional adjustments for compact layout */
