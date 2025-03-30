@@ -336,9 +336,9 @@ function Header({
   
   return (
     <header className="w-full h-16 bg-background border-b border-border sticky top-0 z-40">
-      <div className="w-full h-full flex items-center px-3 md:px-4 relative">
-        {/* Left Section - limit width to prevent pushing right elements offscreen */}
-        <div className="flex items-center h-full max-w-[60%] mr-auto">
+      <div className="w-full h-full flex items-center justify-between px-3 md:px-4 relative">
+        {/* Left Section */}
+        <div className="flex items-center h-full w-[50%] overflow-hidden">
           {/* Mobile menu toggle - only shown on mobile/tablet */}
           {showMobileMenu && layoutType === 'dashboard' && isMobileView && (
             <button 
@@ -360,15 +360,16 @@ function Header({
           )}
         </div>
         
-        {/* Right Section - ensure minimum width and proper spacing */}
-        <div className="flex items-center h-full gap-2 min-w-[150px] justify-end ml-4">
+        {/* Right Section */}
+        <div className="flex items-center h-full space-x-3 w-[50%] justify-end">
           {/* Module Dropdown - Only on mobile */}
           {isMobileView && layoutType === 'dashboard' && (
             <div className="h-full flex items-center">
               <button
                 onClick={toggleMobileNav}
                 className={cn(
-                  "flex items-center justify-center px-3 py-1.5 rounded-md text-white font-medium h-8",
+                  "flex items-center justify-center px-3 py-1.5 rounded-md text-white font-medium shadow-sm h-8",
+                  "transition-all duration-200",
                   activeModule?.color?.replace('bg-', '') || 'bg-gradient-to-r from-blue-500 to-blue-600'
                 )}
               >
@@ -378,7 +379,7 @@ function Header({
                 <span className="text-xs sm:text-sm">{isExtraSmall ? activeModule?.title?.slice(0, 4) : activeModule?.title}</span>
                 <ChevronDown 
                   size={14}
-                  className={cn("ml-1", mobileNavOpen && "rotate-180")}
+                  className={cn("ml-1 transition-transform", mobileNavOpen && "rotate-180")}
                 />
               </button>
             </div>
@@ -392,7 +393,7 @@ function Header({
                 <div className="h-full flex items-center">
                   <button
                     onClick={() => setOpen({ ...open, wallet: !open.wallet, language: false, user: false })}
-                    className="flex items-center px-3 py-1.5 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-xs h-8"
+                    className="flex items-center px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-xs h-8"
                     title="Connect Wallet"
                     aria-label="Connect blockchain wallet"
                   >
@@ -435,11 +436,11 @@ function Header({
           <div className="h-full flex items-center">
             <button 
               onClick={() => setOpen({ ...open, user: !open.user, wallet: false, language: false })}
-              className="h-8 w-8 flex items-center justify-center rounded-full bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700"
+              className="h-8 w-8 flex items-center justify-center rounded-full bg-primary/10 hover:bg-primary/20 text-primary"
               aria-label="User menu"
               title="Account menu"
             >
-              <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs">
+              <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs">
                 U
               </div>
             </button>
