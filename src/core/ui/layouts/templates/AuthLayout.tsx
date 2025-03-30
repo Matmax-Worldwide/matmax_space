@@ -53,12 +53,31 @@ export function AuthLayout({
             {/* Shooting stars */}
             <div className="shooting-stars absolute inset-0"></div>
             
+            {/* Comets */}
+            <div className="comets absolute inset-0"></div>
+            
+            {/* Supernovas */}
+            <div className="supernova-container absolute inset-0">
+              <div className="supernova supernova-1"></div>
+              <div className="supernova supernova-2"></div>
+              <div className="supernova supernova-3"></div>
+            </div>
+            
+            {/* Star crossings */}
+            <div className="star-crossings absolute inset-0"></div>
+            
+            {/* Spiral galaxy */}
+            <div className="spiral-galaxy absolute inset-0"></div>
+            
             {/* Distant galaxies */}
             <div className="galaxies absolute inset-0"></div>
             
             {/* Nebula overlay */}
             <div className="nebula-1 absolute inset-0 opacity-30"></div>
             <div className="nebula-2 absolute inset-0 opacity-20"></div>
+            
+            {/* Aurora effect */}
+            <div className="aurora absolute inset-0"></div>
             
             {/* Distant star clusters */}
             <div className="star-clusters absolute inset-0"></div>
@@ -188,6 +207,104 @@ export function AuthLayout({
               100% { transform: translateY(0) scaleX(1); }
             }
             
+            /* New animations for enhanced space scene */
+            @keyframes supernovaExplosion {
+              0% {
+                transform: scale(0.5);
+                opacity: 0;
+                filter: blur(2px);
+              }
+              5% {
+                opacity: 0.1;
+                filter: blur(5px);
+              }
+              20% {
+                transform: scale(1);
+                opacity: 1;
+                filter: blur(15px);
+              }
+              100% {
+                transform: scale(1.8);
+                opacity: 0;
+                filter: blur(30px);
+              }
+            }
+            
+            @keyframes comet {
+              0% {
+                transform: translateX(-5%) translateY(-5%) rotate(-35deg) scale(0.3);
+                opacity: 0;
+              }
+              10% {
+                opacity: 1;
+              }
+              90% {
+                opacity: 1;
+              }
+              100% {
+                transform: translateX(105%) translateY(105%) rotate(-35deg) scale(1.2);
+                opacity: 0;
+              }
+            }
+            
+            @keyframes starCrossing {
+              0% {
+                transform: translateX(-10%) translateY(20%) scale(0.8);
+                opacity: 0;
+              }
+              5% {
+                opacity: 0.7;
+              }
+              95% {
+                opacity: 0.7;
+              }
+              100% {
+                transform: translateX(110%) translateY(80%) scale(0.8);
+                opacity: 0;
+              }
+            }
+            
+            @keyframes auroraWave {
+              0% {
+                transform: translateY(0) scaleY(1) skewX(0deg);
+                opacity: 0.1;
+                filter: blur(30px) hue-rotate(0deg);
+              }
+              33% {
+                transform: translateY(20px) scaleY(1.2) skewX(5deg);
+                opacity: 0.2;
+                filter: blur(35px) hue-rotate(120deg);
+              }
+              66% {
+                transform: translateY(-20px) scaleY(0.8) skewX(-5deg);
+                opacity: 0.15;
+                filter: blur(40px) hue-rotate(240deg);
+              }
+              100% {
+                transform: translateY(0) scaleY(1) skewX(0deg);
+                opacity: 0.1;
+                filter: blur(30px) hue-rotate(360deg);
+              }
+            }
+            
+            @keyframes spiralSpin {
+              0% {
+                transform: rotate(0deg) scale(1);
+                opacity: 0.4;
+                filter: blur(10px);
+              }
+              50% {
+                transform: rotate(180deg) scale(1.1);
+                opacity: 0.7;
+                filter: blur(15px);
+              }
+              100% {
+                transform: rotate(360deg) scale(1);
+                opacity: 0.4;
+                filter: blur(10px);
+              }
+            }
+            
             /* Small stars with parallax */
             .stars-small {
               background-image: radial-gradient(0.8px 0.8px at 20px 30px, rgba(255, 255, 255, 0.8), rgba(0,0,0,0)),
@@ -283,6 +400,146 @@ export function AuthLayout({
               animation: shooting 8s 3s infinite ease-in;
             }
             
+            /* Comets with glowing tails */
+            .comets {
+              position: relative;
+              width: 100%;
+              height: 100%;
+            }
+            
+            .comets::before,
+            .comets::after {
+              content: "";
+              position: absolute;
+              width: 200px;
+              height: 2px;
+              background: linear-gradient(to right, rgba(85, 168, 255, 0) 0%, rgba(85, 168, 255, 1) 30%, rgba(255, 255, 255, 1) 100%);
+              border-radius: 50%;
+              box-shadow: 0 0 15px 5px rgba(85, 168, 255, 0.7);
+              opacity: 0;
+              top: 15%;
+              left: 25%;
+              transform-origin: right center;
+              animation: comet 12s 5s infinite ease-out;
+            }
+            
+            .comets::after {
+              top: 65%;
+              left: 70%;
+              width: 150px;
+              height: 1.5px;
+              background: linear-gradient(to right, rgba(218, 85, 255, 0) 0%, rgba(218, 85, 255, 1) 30%, rgba(255, 255, 255, 1) 100%);
+              box-shadow: 0 0 15px 5px rgba(218, 85, 255, 0.7);
+              animation: comet 15s 2s infinite ease-out;
+            }
+            
+            /* Star crossings - horizontal star movement */
+            .star-crossings {
+              position: relative;
+              width: 100%;
+              height: 100%;
+            }
+            
+            .star-crossings::before,
+            .star-crossings::after {
+              content: "";
+              position: absolute;
+              width: 2px;
+              height: 2px;
+              background: rgba(255, 255, 255, 1);
+              border-radius: 50%;
+              box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.8);
+              opacity: 0;
+              top: 35%;
+              left: 0;
+              animation: starCrossing 8s 1s infinite linear;
+            }
+            
+            .star-crossings::after {
+              top: 75%;
+              width: 3px;
+              height: 3px;
+              box-shadow: 0 0 6px 3px rgba(255, 255, 255, 0.8);
+              animation: starCrossing 15s 4s infinite linear;
+            }
+            
+            /* Supernovas */
+            .supernova-container {
+              position: relative;
+              width: 100%;
+              height: 100%;
+            }
+            
+            .supernova {
+              position: absolute;
+              border-radius: 50%;
+              opacity: 0;
+              will-change: transform, opacity, filter;
+            }
+            
+            .supernova-1 {
+              width: 100px;
+              height: 100px;
+              top: 25%;
+              left: 30%;
+              background: radial-gradient(circle, rgba(255, 236, 145, 1) 0%, rgba(255, 144, 89, 0.8) 40%, rgba(255, 59, 148, 0.4) 70%, rgba(41, 13, 153, 0) 100%);
+              box-shadow: 0 0 40px 20px rgba(255, 236, 145, 0.5);
+              filter: blur(15px);
+              animation: supernovaExplosion 15s 2s infinite ease-out;
+            }
+            
+            .supernova-2 {
+              width: 80px;
+              height: 80px;
+              top: 60%;
+              left: 65%;
+              background: radial-gradient(circle, rgba(176, 255, 252, 1) 0%, rgba(86, 139, 255, 0.8) 40%, rgba(111, 59, 255, 0.4) 70%, rgba(28, 13, 153, 0) 100%);
+              box-shadow: 0 0 30px 15px rgba(176, 255, 252, 0.5);
+              filter: blur(12px);
+              animation: supernovaExplosion 20s 8s infinite ease-out;
+            }
+            
+            .supernova-3 {
+              width: 120px;
+              height: 120px;
+              top: 15%;
+              left: 70%;
+              background: radial-gradient(circle, rgba(255, 217, 255, 1) 0%, rgba(255, 115, 221, 0.8) 40%, rgba(187, 59, 255, 0.4) 70%, rgba(60, 13, 153, 0) 100%);
+              box-shadow: 0 0 50px 25px rgba(255, 217, 255, 0.5);
+              filter: blur(18px);
+              animation: supernovaExplosion 25s 5s infinite ease-out;
+            }
+            
+            /* Spiral galaxy */
+            .spiral-galaxy {
+              position: absolute;
+              top: 50%;
+              left: 45%;
+              width: 200px;
+              height: 200px;
+              border-radius: 50%;
+              background: 
+                conic-gradient(
+                  from 0deg,
+                  transparent 0deg 30deg,
+                  rgba(123, 97, 255, 0.2) 40deg 50deg,
+                  transparent 60deg 120deg,
+                  rgba(201, 97, 255, 0.2) 130deg 140deg,
+                  transparent 150deg 210deg,
+                  rgba(97, 223, 255, 0.2) 220deg 230deg,
+                  transparent 240deg 300deg,
+                  rgba(148, 97, 255, 0.2) 310deg 320deg,
+                  transparent 330deg 360deg
+                ),
+                radial-gradient(circle at center, rgba(246, 236, 255, 0.8) 0%, rgba(103, 97, 255, 0.5) 20%, rgba(29, 38, 113, 0) 100%);
+              filter: blur(12px);
+              transform-origin: center;
+              opacity: 0.4;
+              animation: spiralSpin 30s linear infinite;
+              transform: translate(-50%, -50%);
+              will-change: transform, opacity;
+            }
+            
             /* Galaxies */
             .galaxies {
               background-image: radial-gradient(40px 40px at 150px 150px, rgba(111, 74, 217, 0.5), rgba(0,0,0,0) 70%),
@@ -296,6 +553,25 @@ export function AuthLayout({
               animation: float 40s infinite ease-in-out, pulse 15s infinite alternate;
               will-change: transform, opacity, filter;
               filter: blur(15px);
+            }
+            
+            /* Aurora effect */
+            .aurora {
+              position: absolute;
+              height: 300px;
+              left: 0;
+              right: 0;
+              bottom: -50px;
+              background: linear-gradient(to top, 
+                rgba(0, 255, 189, 0) 0%, 
+                rgba(0, 255, 189, 0.1) 20%, 
+                rgba(92, 0, 255, 0.2) 60%, 
+                rgba(0, 123, 255, 0.1) 80%, 
+                rgba(0, 149, 255, 0) 100%);
+              filter: blur(40px);
+              opacity: 0.15;
+              animation: auroraWave 20s infinite ease-in-out;
+              will-change: transform, opacity;
             }
             
             /* Star clusters */
