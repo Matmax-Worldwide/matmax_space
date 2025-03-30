@@ -91,74 +91,115 @@ export function ModuleMenu({
       {isMobileView ? (
         <div 
           className={cn(
-            "fixed inset-0 bg-white dark:bg-neutral-900 z-50 flex flex-col transition-transform duration-300 ease-in-out",
-            moduleMenuVisible ? "translate-x-0" : "translate-x-full"
+            "fixed inset-0 z-50 transition-opacity duration-300 ease-in-out",
+            moduleMenuVisible ? "opacity-100" : "opacity-0"
           )}
         >
-          {/* Menu Header */}
-          <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-700">
-            <h2 className="font-bold text-lg">Modules</h2>
-            <button 
-              onClick={onClose}
-              className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
-          </div>
+          {/* Backdrop overlay */}
+          <div 
+            className={cn(
+              "absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300",
+              moduleMenuVisible ? "opacity-100" : "opacity-0"
+            )}
+            onClick={onClose}
+          />
           
-          {/* Module Sections - Scrollable */}
-          <div className="flex-1 overflow-y-auto p-4">
-            <div className="space-y-4">
-              {SECTIONS.map((section) => {
-                const Icon = section.icon;
-                const isActive = section.id.toLowerCase() === currentSectionId.toLowerCase();
-                
-                return (
-                  <button
-                    key={section.id}
-                    onClick={() => handleSectionClick(section.id)}
-                    className={cn(
-                      "flex flex-col w-full p-4 rounded-lg border transition-all duration-200",
-                      isActive
-                        ? "bg-neutral-100 dark:bg-neutral-800 border-primary"
-                        : "border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800/70"
-                    )}
-                  >
-                    <div className="flex items-center mb-2">
-                      <div className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br mr-3",
-                        section.color
-                      )}>
-                        <Icon className="h-5 w-5 text-white" />
+          {/* Menu panel */}
+          <div 
+            className={cn(
+              "absolute top-0 right-0 h-full w-[85%] max-w-[350px] bg-white dark:bg-neutral-900 shadow-2xl flex flex-col transition-all duration-300 ease-out",
+              moduleMenuVisible ? "translate-x-0" : "translate-x-full"
+            )}
+          >
+            {/* Menu Header */}
+            <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-700">
+              <h2 className="font-bold text-lg">Modules</h2>
+              <button 
+                onClick={onClose}
+                className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            
+            {/* Module Sections - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <div className="space-y-4">
+                {SECTIONS.map((section, index) => {
+                  const Icon = section.icon;
+                  const isActive = section.id.toLowerCase() === currentSectionId.toLowerCase();
+                  
+                  return (
+                    <button
+                      key={section.id}
+                      onClick={() => handleSectionClick(section.id)}
+                      className={cn(
+                        "flex flex-col w-full p-4 rounded-lg border transition-all duration-200",
+                        isActive
+                          ? "bg-neutral-100 dark:bg-neutral-800 border-primary"
+                          : "border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800/70"
+                      )}
+                      style={{
+                        transitionDelay: `${index * 50}ms`,
+                        opacity: moduleMenuVisible ? 1 : 0,
+                        transform: moduleMenuVisible ? 'translateY(0)' : 'translateY(20px)'
+                      }}
+                    >
+                      <div className="flex items-center mb-2">
+                        <div className={cn(
+                          "w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br mr-3 transition-transform duration-300 hover:scale-110",
+                          section.color
+                        )}>
+                          <Icon className="h-5 w-5 text-white" />
+                        </div>
+                        <h3 className={cn(
+                          "font-semibold text-lg transition-colors duration-200",
+                          isActive ? section.textColor : ""
+                        )}>
+                          {section.title}
+                        </h3>
                       </div>
-                      <h3 className={cn(
-                        "font-semibold text-lg",
-                        isActive ? section.textColor : ""
-                      )}>
-                        {section.title}
-                      </h3>
-                    </div>
-                    <p className="text-sm text-muted-foreground pl-12">
-                      {section.description}
-                    </p>
-                  </button>
-                );
-              })}
+                      <p className="text-sm text-muted-foreground pl-12">
+                        {section.description}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
       ) : (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-neutral-900 rounded-lg w-full max-w-2xl p-6 shadow-xl">
+        <div 
+          className={cn(
+            "fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300",
+            moduleMenuVisible ? "opacity-100" : "opacity-0"
+          )}
+        >
+          {/* Backdrop overlay with blur effect */}
+          <div 
+            className={cn(
+              "absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300",
+              moduleMenuVisible ? "opacity-100" : "opacity-0"
+            )}
+            onClick={onClose}
+          />
+          
+          <div 
+            className={cn(
+              "bg-white dark:bg-neutral-900 rounded-lg w-full max-w-2xl p-6 shadow-xl relative transition-all duration-300 ease-out",
+              moduleMenuVisible ? "translate-y-0 scale-100" : "translate-y-8 scale-95"
+            )}
+          >
             {/* Menu Header */}
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold">Select Module</h2>
               <button 
                 onClick={onClose} 
-                className="p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                className="p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200"
               >
                 <span className="sr-only">Close</span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -167,7 +208,7 @@ export function ModuleMenu({
             
             {/* Module Grid */}
             <div className="grid grid-cols-2 gap-4">
-              {SECTIONS.map((section) => {
+              {SECTIONS.map((section, index) => {
                 const Icon = section.icon;
                 const isActive = section.id.toLowerCase() === currentSectionId.toLowerCase();
                 
@@ -176,21 +217,26 @@ export function ModuleMenu({
                     key={section.id}
                     onClick={() => handleSectionClick(section.id)}
                     className={cn(
-                      "flex flex-col p-4 rounded-lg border transition-all duration-200",
+                      "flex flex-col p-4 rounded-lg border transition-all duration-200 hover:shadow-md",
                       isActive 
                         ? "bg-neutral-100 dark:bg-neutral-800 border-primary" 
                         : "border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800/70"
                     )}
+                    style={{
+                      transitionDelay: `${index * 50}ms`,
+                      opacity: moduleMenuVisible ? 1 : 0,
+                      transform: moduleMenuVisible ? 'translateY(0)' : 'translateY(10px)'
+                    }}
                   >
                     <div className="flex items-center mb-2">
                       <div className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br mr-3",
+                        "w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br mr-3 transition-transform duration-300 hover:scale-110",
                         section.color
                       )}>
                         <Icon className="h-5 w-5 text-white" />
                       </div>
                       <h3 className={cn(
-                        "font-semibold",
+                        "font-semibold transition-colors duration-200",
                         isActive ? section.textColor : ""
                       )}>
                         {section.title}
