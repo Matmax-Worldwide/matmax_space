@@ -323,14 +323,14 @@ function Header({
       // Use fixed position for both mobile and desktop with high z-index
       'fixed top-0 left-0 right-0 z-50',
       transparent && 'bg-transparent dark:bg-transparent border-transparent',
-      className
+        className
     )}>
       {/* Container with grid layout for better alignment */}
       <div className="w-full grid grid-cols-3 items-center">
         {/* Left side - Logo and toggle */}
         <div className="flex items-center gap-2">
           {/* Hamburger menu moved to the right side, so only logo here now */}
-          <Logo size="default" darkModeInvert={true} />
+          <Logo size={isMobileView ? "small" : "default"} darkModeInvert={true} />
         </div>
         
         {/* Center - Navigation */}
@@ -384,7 +384,7 @@ function Header({
               </button>
               
               {/* Account settings button (icon only) for mobile - rightmost position */}
-              <button 
+            <button 
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
@@ -395,7 +395,7 @@ function Header({
                 data-action="manage-account-mobile"
               >
                 <Settings className="h-5 w-5 text-muted-foreground" />
-              </button>
+            </button>
             </>
           )}
           
@@ -420,8 +420,8 @@ function Header({
             </div>
           )}
         </div>
-      </div>
-      
+        </div>
+        
       {/* Mobile Module Menu - Slides in from right */}
       {moduleMenuOpen && (
         <div 
@@ -450,9 +450,9 @@ function Header({
               {NAV_ITEMS.map((item: NavItem) => {
                 const isActive = item.section.toLowerCase() === activeSection?.toLowerCase();
                 return (
-                  <button
+            <button
                     key={item.section}
-                    onClick={(e) => {
+              onClick={(e) => {
                       e.preventDefault();
                       
                       // Close the menu
@@ -738,7 +738,7 @@ function SettingsMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </button>
                 
-                <button 
+            <button
                   className="flex w-full items-center justify-between px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                   onClick={() => setShowThemeOptions(true)}
                 >
@@ -781,7 +781,7 @@ function SettingsMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
                 <button className="flex w-full items-center px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 dark:text-red-400">
                   <LogOut className="w-5 h-5 mr-3" />
                   <span className="text-base font-medium">Sign Out</span>
-                </button>
+            </button>
               </div>
             )}
             
@@ -1026,8 +1026,8 @@ function SettingsMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
                 </p>
               </div>
             )}
-          </div>
         </div>
+      </div>
       )}
     </>
   );
