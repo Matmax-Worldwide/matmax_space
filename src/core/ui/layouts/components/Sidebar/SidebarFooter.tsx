@@ -64,7 +64,6 @@ export function SidebarFooter() {
           <Info size={12} className="mr-1.5" />
           <span>{appVersion} ({environmentName})</span>
         </div>
-        <p>© {new Date().getFullYear()} MatMax Wellness Studio</p>
       </div>
     </div>
   );
