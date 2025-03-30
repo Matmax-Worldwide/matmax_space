@@ -36,11 +36,11 @@ export function AuthLayout({
     const { isMobile, isSmallMobile, theme } = useLayout();
     
     return (
-      <div className="flex min-h-screen bg-background relative">
+      <div className="flex min-h-screen bg-background relative overflow-hidden">
         {/* Space background - now shown on all devices */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 overflow-hidden">
           {/* Space background base */}
-          <div className="absolute inset-0 bg-black">
+          <div className="absolute inset-0 bg-black overflow-hidden">
             {/* Stars layer - small dots with parallax effect */}
             <div className="stars-small absolute inset-0"></div>
             
@@ -250,12 +250,12 @@ export function AuthLayout({
           
           @keyframes parallax {
             0% { transform: translateZ(0) translateX(0) translateY(0); }
-            100% { transform: translateZ(0) translateX(-40%) translateY(10%); }
+            100% { transform: translateZ(0) translateX(-30%) translateY(8%); }
           }
           
           @keyframes parallaxSlow {
             0% { transform: translateZ(0) translateX(0) translateY(0); }
-            100% { transform: translateZ(0) translateX(-20%) translateY(5%); }
+            100% { transform: translateZ(0) translateX(-15%) translateY(4%); }
           }
           
           @keyframes dust {
@@ -312,7 +312,7 @@ export function AuthLayout({
               opacity: 1;
             }
             100% {
-              transform: translateX(105%) translateY(105%) rotate(-35deg) scale(1.2);
+              transform: translateX(85%) translateY(85%) rotate(-35deg) scale(1);
               opacity: 0;
             }
           }
@@ -683,6 +683,32 @@ export function AuthLayout({
             animation: nebulaPulse 20s 5s infinite alternate-reverse, floatSlow 40s infinite ease-in-out;
             will-change: transform, opacity, filter;
             filter: blur(35px);
+          }
+          
+          /* Mobile-specific adjustments */
+          @media (max-width: 768px) {
+            .stars-small, .stars-medium, .stars-large {
+              background-size: 200px 200px;
+            }
+            
+            .spiral-galaxy {
+              width: 150px;
+              height: 150px;
+            }
+            
+            .supernova-1, .supernova-2, .supernova-3 {
+              transform-origin: center;
+              /* Make supernovas slightly smaller on mobile */
+              transform: scale(0.8);
+            }
+            
+            .galaxies {
+              background-size: 400px 400px;
+            }
+            
+            .star-clusters {
+              background-size: 600px 600px;
+            }
           }
         `}</style>
       </div>
