@@ -99,7 +99,7 @@ export function AuthLayout({
             />
             <h1 className="text-3xl font-bold mb-2 text-white">MatMax Wellness Studio</h1>
             <p className="text-lg max-w-md text-white opacity-90">
-              Your journey to wellness and balance begins here
+              welcome to our universe
             </p>
           </div>
           
