@@ -18,20 +18,19 @@ export function Logo({
   darkModeInvert = true  // Default to true for consistent dark mode behavior
 }: LogoProps) {
   const { theme } = useLayout();
-  const isDarkMode = theme === 'dark' || (theme === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   
   return (
     <div className={cn("relative", className)}>
       <Image 
         src="/logo_mtmx_black-01.svg" 
         alt={alt}
-        width={120}
-        height={40} 
+        width={240}
+        height={90} 
         className={cn(
           "object-contain",
-          (darkModeInvert && isDarkMode) ? "invert" : "", // Apply inversion directly based on theme
-          darkModeInvert && "dark:invert" // Also keep the CSS class for system preference changes
+          darkModeInvert ? "dark:invert" : "" // Only invert in dark mode
         )}
+        priority
       />
     </div>
   );
