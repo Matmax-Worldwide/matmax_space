@@ -2,13 +2,8 @@ import React from 'react';
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 
+// Only export the runtime
 export const runtime = 'edge';
-export const alt = 'MatMax Wellness Studio';
-export const contentType = 'image/png';
-export const size = {
-  width: 1200,
-  height: 630,
-};
 
 export async function GET(req: NextRequest) {
   try {
@@ -51,7 +46,13 @@ export async function GET(req: NextRequest) {
           </div>
         </div>
       ),
-      { ...size }
+      {
+        width: 1200,
+        height: 630,
+        headers: {
+          'Content-Type': 'image/png',
+        }
+      }
     );
   } catch (error) {
     console.error('Error generating OpenGraph image:', error);
