@@ -30,7 +30,6 @@ export function SettingsMenu({ isOpen, onClose, settingsMenuVisible }: SettingsM
     { code: 'es', name: 'Español', flag: '🇪🇸' },
     { code: 'fr', name: 'Français', flag: '🇫🇷' },
     { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-    { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
   ];
   
   // Available wallet options

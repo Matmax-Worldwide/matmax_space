@@ -170,53 +170,60 @@ export function LayoutProvider({
         
         console.log(`Found section in URL: ${sectionFromUrl}`);
         
-        setActiveSection(sectionFromUrl);
-        setCurrentModule(sectionFromUrl as ModuleType);
+        // Add a small delay to prevent flickering during transitions
+        setTimeout(() => {
+          setActiveSection(sectionFromUrl);
+          setCurrentModule(sectionFromUrl as ModuleType);
+          
+          // Store in localStorage for state persistence across refreshes
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('activeSection', sectionFromUrl);
+          }
+        }, 50);
         
-        // Store in localStorage for state persistence across refreshes
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('activeSection', sectionFromUrl);
-        }
         return; // Skip further checks
       }
     }
     
-    // Default section detection based on routes
-    // Determine which section is active based on the current route
-    if (route.startsWith('/dashboard') || route === '/') {
-      setActiveSection('main');
-      setCurrentModule('main');
-    } else if (route.startsWith('/lms')) {
-      setActiveSection('lms');
-      setCurrentModule('lms');
-    } else if (route.startsWith('/admin')) {
-      setActiveSection('admin');
-      setCurrentModule('admin');
-    } else if (route.startsWith('/payments')) {
-      setActiveSection('payments');
-      setCurrentModule('payments');
-    } else if (route.startsWith('/finance')) {
-      setActiveSection('finance');
-      setCurrentModule('finance');
-    } else if (route.startsWith('/international')) {
-      setActiveSection('main'); // International is part of the main module
-      setCurrentModule('main');
-    } else if (route.startsWith('/support')) {
-      setActiveSection('support');
-      setCurrentModule('support');
-    } else if (route.startsWith('/store')) {
-      setActiveSection('store');
-      setCurrentModule('store');
-    } else if (route.startsWith('/resources')) {
-      setActiveSection('resources');
-      setCurrentModule('resources');
-    } else if (route.startsWith('/analytics')) {
-      setActiveSection('analytics');
-      setCurrentModule('analytics');
-    } else if (route.startsWith('/blockchain')) {
-      setActiveSection('main'); // Blockchain is part of the main module
-      setCurrentModule('main');
-    }
+    // Add a small delay for the rest of the section changes as well
+    setTimeout(() => {
+      // Default section detection based on routes
+      // Determine which section is active based on the current route
+      if (route.startsWith('/dashboard') || route === '/') {
+        setActiveSection('main');
+        setCurrentModule('main');
+      } else if (route.startsWith('/lms')) {
+        setActiveSection('lms');
+        setCurrentModule('lms');
+      } else if (route.startsWith('/admin')) {
+        setActiveSection('admin');
+        setCurrentModule('admin');
+      } else if (route.startsWith('/payments')) {
+        setActiveSection('payments');
+        setCurrentModule('payments');
+      } else if (route.startsWith('/finance')) {
+        setActiveSection('finance');
+        setCurrentModule('finance');
+      } else if (route.startsWith('/international')) {
+        setActiveSection('main'); // International is part of the main module
+        setCurrentModule('main');
+      } else if (route.startsWith('/support')) {
+        setActiveSection('support');
+        setCurrentModule('support');
+      } else if (route.startsWith('/store')) {
+        setActiveSection('store');
+        setCurrentModule('store');
+      } else if (route.startsWith('/resources')) {
+        setActiveSection('resources');
+        setCurrentModule('resources');
+      } else if (route.startsWith('/analytics')) {
+        setActiveSection('analytics');
+        setCurrentModule('analytics');
+      } else if (route.startsWith('/blockchain')) {
+        setActiveSection('main'); // Blockchain is part of the main module
+        setCurrentModule('main');
+      }
+    }, 50);
 
     // For mobile, default to sidebar closed on route change
     if (isMobile && route !== '/') {

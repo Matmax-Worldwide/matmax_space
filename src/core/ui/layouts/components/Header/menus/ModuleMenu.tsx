@@ -94,6 +94,7 @@ export function ModuleMenu({
             "fixed inset-0 z-50 transition-opacity duration-300 ease-in-out",
             moduleMenuVisible ? "opacity-100" : "opacity-0"
           )}
+          style={{ willChange: "opacity, transform" }}
         >
           {/* Backdrop overlay */}
           <div 
@@ -101,6 +102,7 @@ export function ModuleMenu({
               "absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300",
               moduleMenuVisible ? "opacity-100" : "opacity-0"
             )}
+            style={{ willChange: "opacity" }}
             onClick={onClose}
           />
           
@@ -110,6 +112,7 @@ export function ModuleMenu({
               "absolute top-0 right-0 h-full w-[85%] max-w-[350px] bg-white dark:bg-neutral-900 shadow-2xl flex flex-col transition-all duration-300 ease-out",
               moduleMenuVisible ? "translate-x-0" : "translate-x-full"
             )}
+            style={{ willChange: "transform, opacity" }}
           >
             {/* Menu Header */}
             <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-700">
@@ -173,6 +176,7 @@ export function ModuleMenu({
             "fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300",
             moduleMenuVisible ? "opacity-100" : "opacity-0"
           )}
+          style={{ willChange: "opacity" }}
         >
           {/* Backdrop overlay with blur effect */}
           <div 
@@ -180,6 +184,7 @@ export function ModuleMenu({
               "absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300",
               moduleMenuVisible ? "opacity-100" : "opacity-0"
             )}
+            style={{ willChange: "opacity" }}
             onClick={onClose}
           />
           
@@ -188,6 +193,7 @@ export function ModuleMenu({
               "bg-white dark:bg-neutral-900 rounded-lg w-full max-w-2xl p-6 shadow-xl relative transition-all duration-300 ease-out",
               moduleMenuVisible ? "translate-y-0 scale-100" : "translate-y-8 scale-95"
             )}
+            style={{ willChange: "transform, opacity" }}
           >
             {/* Menu Header */}
             <div className="flex justify-between items-center mb-6">

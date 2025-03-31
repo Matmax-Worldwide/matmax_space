@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, Suspense } from 'react';
+import React, { useEffect, Suspense, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useLayout } from '@/src/core/ui/layouts/providers/LayoutProvider';
 import { createClient } from "@/utils/supabase/client";
@@ -175,6 +175,10 @@ function ProtectedPageContent() {
   const router = useRouter();
   const { activeSection, setActiveSection } = useLayout();
   
+  // Add state for fade transition
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [currentContent, setCurrentContent] = useState<React.ReactNode>(null);
+  
   // Get section from URL parameter
   const sectionParam = searchParams.get('section')?.toLowerCase();
   
@@ -185,11 +189,25 @@ function ProtectedPageContent() {
     // If section param is provided, set it as active
     if (sectionParam) {
       console.log(`Setting active section to: ${sectionParam}`);
-      setActiveSection(sectionParam);
       
-      // Save to localStorage for persistence
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('activeSection', sectionParam);
+      // Start transition if it's a different section
+      if (activeSection !== sectionParam) {
+        setIsTransitioning(true);
+        
+        // After a short delay, update the section
+        setTimeout(() => {
+          setActiveSection(sectionParam);
+          
+          // Save to localStorage for persistence
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('activeSection', sectionParam);
+          }
+          
+          // End transition after content has updated
+          setTimeout(() => {
+            setIsTransitioning(false);
+          }, 200);
+        }, 150);
       }
     }
     // If no section param and no active section, redirect to dashboard
@@ -226,10 +244,20 @@ function ProtectedPageContent() {
     }
   };
   
+  // Update current content when active section changes
+  useEffect(() => {
+    setCurrentContent(renderSection());
+  }, [activeSection]);
+  
   return (
     <DashboardLayout>
-      <div className="w-full">
-        {renderSection()}
+      <div 
+        className={cn(
+          "w-full transition-opacity duration-300 ease-in-out",
+          isTransitioning ? "opacity-0" : "opacity-100"
+        )}
+      >
+        {currentContent}
       </div>
     </DashboardLayout>
   );

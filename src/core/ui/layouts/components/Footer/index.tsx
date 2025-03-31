@@ -14,7 +14,7 @@ function Footer({ className }: FooterProps) {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="text-sm text-muted-foreground mb-4 md:mb-0">
-            © 2025 MatMax Wellness Studio. All rights reserved.
+            © 2025 MatMax. All rights reserved.
           </div>
           <div className="flex flex-wrap gap-6 text-sm">
             <Link 
